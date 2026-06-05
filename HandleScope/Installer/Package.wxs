@@ -1,0 +1,90 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="HandleScope"
+    Manufacturer="$(var.Manufacturer)"
+    Version="$(var.InstallerProductVersion)"
+    UpgradeCode="{7F5C75EF-BCE5-4B99-91F7-6A45062F84E1}"
+    Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="MainFeature" Title="HandleScope" Level="1">
+      <ComponentGroupRef Id="ApplicationComponents" />
+      <ComponentRef Id="StartMenuShortcutComponent" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="HandleScope" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="HandleScope" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ApplicationComponents" Directory="INSTALLFOLDER">
+      <Component Id="HandleScopeExeComponent">
+        <File Id="HandleScopeExe" Source="$(var.HandleScope.TargetDir)HandleScope.exe" KeyPath="yes" />
+      </Component>
+
+      <Component Id="HandleScopeDllComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="HandleScopeDepsComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.deps.json" KeyPath="yes" />
+      </Component>
+
+      <Component Id="HandleScopeRuntimeConfigComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.runtimeconfig.json" KeyPath="yes" />
+      </Component>
+
+      <Component Id="CommunityToolkitMvvmComponent">
+        <File Source="$(var.HandleScope.TargetDir)CommunityToolkit.Mvvm.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="DependencyInjectionAbstractionsComponent">
+        <File Source="$(var.HandleScope.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="DependencyInjectionComponent">
+        <File Source="$(var.HandleScope.TargetDir)Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="SerilogComponent">
+        <File Source="$(var.HandleScope.TargetDir)Serilog.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="SerilogDebugSinkComponent">
+        <File Source="$(var.HandleScope.TargetDir)Serilog.Sinks.Debug.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="SerilogFileSinkComponent">
+        <File Source="$(var.HandleScope.TargetDir)Serilog.Sinks.File.dll" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="StartMenuShortcutComponent">
+        <Shortcut
+          Id="StartMenuShortcut"
+          Name="HandleScope"
+          Description="Find processes locking files and folders."
+          Target="[INSTALLFOLDER]HandleScope.exe"
+          WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\HandleScope"
+          Name="Installed"
+          Type="integer"
+          Value="1"
+          KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>

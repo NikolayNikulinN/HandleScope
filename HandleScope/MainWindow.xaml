@@ -1,0 +1,183 @@
+<Window x:Class="HandleScope.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="HandleScope"
+        Height="620"
+        MinHeight="520"
+        Width="1040"
+        MinWidth="860"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="HandleScope" />
+            <TextBlock Margin="0,4,0,0"
+                       Foreground="{StaticResource Brush.TextSecondary}"
+                       Text="Find processes locking files and folders." />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Margin="0,0,0,18"
+                Padding="16"
+                Background="{StaticResource Brush.Surface}"
+                BorderBrush="{StaticResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBox Grid.Column="0"
+                         Margin="0,0,12,0"
+                         Text="{Binding TargetPath, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button Grid.Column="1"
+                        Margin="0,0,8,0"
+                        Command="{Binding BrowseCommand}"
+                        Content="Browse" />
+
+                <Button Grid.Column="2"
+                        Margin="0,0,8,0"
+                        Command="{Binding SearchCommand}"
+                        Content="Search"
+                        Style="{StaticResource PrimaryButtonStyle}" />
+
+                <Button Grid.Column="3"
+                        Margin="0,0,8,0"
+                        Command="{Binding RefreshCommand}"
+                        Content="Refresh" />
+
+                <Button Grid.Column="4"
+                        Margin="0,0,8,0"
+                        Command="{Binding EndSelectedProcessCommand}"
+                        Content="End Process" />
+
+                <Button Grid.Column="5"
+                        Command="{Binding CancelSearchCommand}"
+                        Content="Cancel" />
+
+                <StackPanel Grid.Row="1"
+                            Grid.ColumnSpan="6"
+                            Margin="0,14,0,0"
+                            Orientation="Horizontal">
+                    <TextBlock Margin="0,0,8,0"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource Brush.TextSecondary}"
+                               Text="Mode" />
+                    <ComboBox Width="140"
+                              DisplayMemberPath="DisplayName"
+                              ItemsSource="{Binding SearchModes}"
+                              SelectedItem="{Binding SelectedSearchMode}" />
+                    <CheckBox Margin="24,0,0,0"
+                              VerticalAlignment="Center"
+                              Content="Include child paths"
+                              IsChecked="{Binding IncludeChildren}"
+                              IsEnabled="{Binding IsDirectorySearchMode}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Border Background="{StaticResource Brush.Surface}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <DataGrid ItemsSource="{Binding Results}"
+                          SelectedItem="{Binding SelectedResult}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding ProcessName}" Header="Process" Width="2*" />
+                    <DataGridTextColumn Binding="{Binding ProcessId}" Header="PID" Width="90" />
+                    <DataGridTextColumn Binding="{Binding UserName}" Header="User" Width="160" />
+                    <DataGridTextColumn Binding="{Binding ProcessPath}" Header="Executable Path" Width="3*" />
+                    <DataGridTextColumn Binding="{Binding LockedPath}" Header="Locked Path" Width="3*" />
+                    <DataGridTextColumn Binding="{Binding HandleType}" Header="Handle Type" Width="120" />
+                    <DataGridTextColumn Binding="{Binding Access}" Header="Access" Width="120" />
+                </DataGrid.Columns>
+            </DataGrid>
+            </Border>
+
+            <Border Margin="1"
+                    Background="{StaticResource Brush.Surface}">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasResults}" Value="False">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource Brush.TextSecondary}"
+                           Text="{Binding StatusMessage}" />
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="3" Margin="0,14,0,0">
+            <Border Padding="12,8"
+                    Background="{StaticResource Brush.SurfaceMuted}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <TextBlock Foreground="{StaticResource Brush.TextSecondary}"
+                           Text="{Binding StatusMessage}" />
+            </Border>
+
+            <Border Margin="0,8,0,0"
+                    Padding="12,8"
+                    Background="{StaticResource Brush.SurfaceMuted}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="{Binding HasWarnings, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ItemsControl ItemsSource="{Binding Warnings}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}"
+                                       Text="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <Border Margin="0,8,0,0"
+                    Padding="12,8"
+                    Background="{StaticResource Brush.SurfaceMuted}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Foreground="{StaticResource Brush.TextSecondary}"
+                           Text="{Binding ErrorMessage}" />
+            </Border>
+        </StackPanel>
+    </Grid>
+</Window>

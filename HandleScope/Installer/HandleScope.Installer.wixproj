@@ -1,0 +1,15 @@
+<Project Sdk="WixToolset.Sdk/6.0.2" ToolsVersion="4.0">
+  <PropertyGroup>
+    <OutputName>HandleScopeSetup</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <InstallerProductVersion>1.0.0</InstallerProductVersion>
+    <Manufacturer>HandleScope</Manufacturer>
+    <DefineConstants>
+      InstallerProductVersion=$(InstallerProductVersion);
+      Manufacturer=$(Manufacturer)
+    </DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HandleScope.csproj" />
+  </ItemGroup>
+</Project>
