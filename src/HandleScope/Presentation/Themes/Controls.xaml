@@ -30,9 +30,15 @@
         <Setter Property="Cursor" Value="Hand" />
     </Style>
 
+    <Style x:Key="HandCursorComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource MaterialDesignComboBoxItemStyle}">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
     <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignComboBox}">
         <Setter Property="MinHeight" Value="36" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource HandCursorComboBoxItemStyle}" />
     </Style>
 
     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}" />

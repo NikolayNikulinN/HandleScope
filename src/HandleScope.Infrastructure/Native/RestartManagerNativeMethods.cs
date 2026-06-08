@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using HandleScope.Domain;
 
 namespace HandleScope.Infrastructure.Native;
 
@@ -9,13 +10,13 @@ internal static class RestartManagerNativeMethods
     internal const int ErrorSuccess = 0;
     internal const int ErrorMoreData = 234;
 
-    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
+    [DllImport(AppStrings.RestartManagerDllName, CharSet = CharSet.Unicode)]
     internal static extern int RmStartSession(
         out uint sessionHandle,
         int sessionFlags,
         StringBuilder sessionKey);
 
-    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
+    [DllImport(AppStrings.RestartManagerDllName, CharSet = CharSet.Unicode)]
     internal static extern int RmRegisterResources(
         uint sessionHandle,
         uint fileCount,
@@ -25,7 +26,7 @@ internal static class RestartManagerNativeMethods
         uint serviceCount,
         string[]? serviceNames);
 
-    [DllImport("rstrtmgr.dll")]
+    [DllImport(AppStrings.RestartManagerDllName)]
     internal static extern int RmGetList(
         uint sessionHandle,
         out uint processInfoNeeded,
@@ -33,7 +34,7 @@ internal static class RestartManagerNativeMethods
         [In, Out] RmProcessInfo[]? affectedApplications,
         ref uint rebootReasons);
 
-    [DllImport("rstrtmgr.dll")]
+    [DllImport(AppStrings.RestartManagerDllName)]
     internal static extern int RmEndSession(uint sessionHandle);
 
     [StructLayout(LayoutKind.Sequential)]

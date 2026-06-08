@@ -1,4 +1,5 @@
 using HandleScope.Application.Services;
+using HandleScope.Domain;
 using HandleScope.Domain.Models;
 using Serilog;
 
@@ -27,8 +28,8 @@ public sealed class SystemProcessInfoService : IProcessInfoService
         }
         catch (Exception ex)
         {
-            _logger.Warning(ex, "Failed to resolve process details for PID {ProcessId}", processId);
-            return new ProcessDetails(processId, $"PID {processId}", null, null);
+            _logger.Warning(ex, AppStrings.ProcessDetailsResolveFailedLogTemplate, processId);
+            return new ProcessDetails(processId, string.Format(AppStrings.ProcessDetailsFallbackNameFormat, processId), null, null);
         }
     }
 
@@ -40,7 +41,7 @@ public sealed class SystemProcessInfoService : IProcessInfoService
         }
         catch (Exception ex)
         {
-            _logger.Debug(ex, "Failed to resolve executable path for PID {ProcessId}", process.Id);
+            _logger.Debug(ex, AppStrings.ExecutablePathResolveFailedLogTemplate, process.Id);
             return null;
         }
     }

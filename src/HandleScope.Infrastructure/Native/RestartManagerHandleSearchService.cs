@@ -1,4 +1,5 @@
 using HandleScope.Application.Services;
+using HandleScope.Domain;
 using HandleScope.Domain.Enums;
 using HandleScope.Domain.Models;
 using HandleScope.Domain.Results;
@@ -41,7 +42,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
         var error = RestartManagerNativeMethods.RmStartSession(out var sessionHandle, 0, sessionKey);
         if (error != RestartManagerNativeMethods.ErrorSuccess)
         {
-            throw new Win32Exception(error, "Failed to start Restart Manager session.");
+            throw new Win32Exception(error, AppStrings.RestartManagerStartSessionFailed);
         }
 
         try
@@ -59,7 +60,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (error != RestartManagerNativeMethods.ErrorSuccess)
             {
-                throw new Win32Exception(error, "Failed to register resources with Restart Manager.");
+                throw new Win32Exception(error, AppStrings.RestartManagerRegisterResourcesFailed);
             }
 
             var processInfoNeeded = 0u;
@@ -87,7 +88,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
                 if (error != RestartManagerNativeMethods.ErrorSuccess)
                 {
-                    throw new Win32Exception(error, "Failed to get locking process list from Restart Manager.");
+                    throw new Win32Exception(error, AppStrings.RestartManagerGetLockingProcessListFailed);
                 }
 
                 var items = CreateResults(affectedApplications.Take((int)processInfoCount), request, resources);
@@ -102,7 +103,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (error != RestartManagerNativeMethods.ErrorSuccess)
             {
-                throw new Win32Exception(error, "Failed to get locking process list from Restart Manager.");
+                throw new Win32Exception(error, AppStrings.RestartManagerGetLockingProcessListFailed);
             }
 
             LogCompletion(request, resources.Count, 0);
@@ -148,7 +149,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
                 details.UserName,
                 lockedPath,
                 application.ApplicationType.ToString(),
-                "Restart Manager"));
+                AppStrings.RestartManagerSourceName));
         }
 
         return results
@@ -165,7 +166,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
         {
             if (!File.Exists(targetPath))
             {
-                warnings.Add("The target file does not exist. Restart Manager can inspect only existing files.");
+                warnings.Add(AppStrings.TargetFileMissingWarning);
                 return Array.Empty<string>();
             }
 
@@ -174,7 +175,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
         if (!Directory.Exists(targetPath))
         {
-            warnings.Add("The target folder does not exist. Restart Manager can inspect only files inside existing folders.");
+            warnings.Add(AppStrings.TargetFolderMissingWarning);
             return Array.Empty<string>();
         }
 
@@ -192,14 +193,14 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (resources.Count >= MaxFolderResources)
             {
-                warnings.Add($"Folder search was limited to the first {MaxFolderResources} files.");
+                warnings.Add(string.Format(AppStrings.FolderSearchLimitedFormat, MaxFolderResources));
                 break;
             }
         }
 
         if (resources.Count == 0)
         {
-            warnings.Add("No files were found inside the folder. Pure directory handles are not detected by Restart Manager.");
+            warnings.Add(AppStrings.EmptyFolderWarning);
         }
 
         return resources;
@@ -223,7 +224,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
     private void LogCompletion(HandleSearchRequest request, int resourceCount, int resultCount)
     {
         _logger.Information(
-            "Restart Manager search completed for {TargetPath}. Registered {ResourceCount} resources and found {ResultCount} processes.",
+            AppStrings.RestartManagerSearchCompletedLogTemplate,
             request.TargetPath,
             resourceCount,
             resultCount);

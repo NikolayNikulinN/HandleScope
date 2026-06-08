@@ -1,5 +1,6 @@
 using System.Windows;
 using HandleScope.Application.Services;
+using HandleScope.Domain;
 using HandleScope.Infrastructure.Native;
 using HandleScope.Infrastructure.Process;
 using HandleScope.Presentation.ViewModels;
@@ -21,12 +22,12 @@ namespace HandleScope
                 .Enrich.FromLogContext()
                 .WriteTo.Debug()
                 .WriteTo.File(
-                    "logs/handlescope-.log",
+                    AppStrings.LogFilePath,
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 14)
                 .CreateLogger();
 
-            Log.Information("HandleScope starting");
+            Log.Information(AppStrings.ApplicationStartingLogMessage);
 
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -39,7 +40,7 @@ namespace HandleScope
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Log.Information("HandleScope shutting down");
+            Log.Information(AppStrings.ApplicationShuttingDownLogMessage);
             _serviceProvider?.Dispose();
             Log.CloseAndFlush();
 

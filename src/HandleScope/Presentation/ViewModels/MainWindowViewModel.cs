@@ -1,19 +1,20 @@
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HandleScope.Application.Services;
+using HandleScope.Domain;
 using HandleScope.Domain.Enums;
 using HandleScope.Domain.Models;
 using Serilog;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows;
 
 namespace HandleScope.Presentation.ViewModels;
 
 public sealed partial class MainWindowViewModel : ObservableObject
 {
-    private static readonly HandleSearchModeOption FileSearchMode = new("File", HandleSearchMode.File);
-    private static readonly HandleSearchModeOption DirectorySearchMode = new("Folder", HandleSearchMode.Directory);
+    private static readonly HandleSearchModeOption FileSearchMode = new(AppStrings.FileSearchModeDisplayName, HandleSearchMode.File);
+    private static readonly HandleSearchModeOption DirectorySearchMode = new(AppStrings.DirectorySearchModeDisplayName, HandleSearchMode.Directory);
 
     private readonly IHandleSearchService _handleSearchService;
     private readonly IProcessActionService _processActionService;
@@ -62,7 +63,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private HandleLockInfo? _selectedResult;
 
     [ObservableProperty]
-    private string _statusMessage = "Enter a file or folder path to find locking processes.";
+    private string _statusMessage = AppStrings.InitialStatusMessage;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
@@ -115,7 +116,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = "Select target folder",
+                Description = AppStrings.SelectTargetFolderDescription,
                 UseDescriptionForTitle = true,
                 SelectedPath = Directory.Exists(TargetPath) ? TargetPath : string.Empty
             };
@@ -132,7 +133,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             CheckFileExists = false,
             CheckPathExists = true,
-            Title = "Select target file"
+            Title = AppStrings.SelectTargetFileTitle
         };
 
         if (fileDialog.ShowDialog() == true)
@@ -157,8 +158,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         var selected = SelectedResult;
         var confirmation = System.Windows.MessageBox.Show(
-            $"End process {selected.ProcessName} (PID {selected.ProcessId})?",
-            "Confirm Process Termination",
+            string.Format(AppStrings.ConfirmProcessTerminationFormat, selected.ProcessName, selected.ProcessId),
+            AppStrings.ConfirmProcessTerminationTitle,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning,
             MessageBoxResult.No);
@@ -172,7 +173,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             IsEndingProcess = true;
             ErrorMessage = null;
-            StatusMessage = $"Ending process {selected.ProcessName}...";
+            StatusMessage = string.Format(AppStrings.EndingProcessStatusFormat, selected.ProcessName);
 
             var result = await _processActionService.CloseProcessAsync(selected.ProcessId, CancellationToken.None);
             StatusMessage = result.Message;
@@ -193,8 +194,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Failed to end process {ProcessId}", selected.ProcessId);
-            ErrorMessage = "Failed to end process. See the log file for details.";
+            _logger.Error(ex, AppStrings.EndProcessFailedLogTemplate, selected.ProcessId);
+            ErrorMessage = AppStrings.EndProcessFailedUserMessage;
             StatusMessage = ErrorMessage;
         }
         finally
@@ -217,7 +218,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         try
         {
             IsSearching = true;
-            StatusMessage = "Searching for locking processes...";
+            StatusMessage = AppStrings.SearchInProgressStatusMessage;
 
             if (rememberRequest)
             {
@@ -226,7 +227,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             _logger.Information(
-                "Starting handle search for {TargetPath} with mode {SearchMode} and includeChildren={IncludeChildren}",
+                AppStrings.StartingHandleSearchLogTemplate,
                 request.TargetPath,
                 request.SearchMode,
                 request.IncludeChildren);
@@ -246,17 +247,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
             NotifyCollectionStateChanged();
 
             StatusMessage = result.Items.Count == 0
-                ? "No locking processes found."
-                : $"Found {result.Items.Count} locking process entries.";
+                ? AppStrings.NoLockingProcessesFoundStatusMessage
+                : string.Format(AppStrings.LockingProcessEntriesFoundFormat, result.Items.Count);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "Search cancelled.";
+            StatusMessage = AppStrings.SearchCancelledStatusMessage;
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Search failed for {TargetPath}", request.TargetPath);
-            ErrorMessage = "Search failed. See the log file for details.";
+            _logger.Error(ex, AppStrings.SearchFailedLogTemplate, request.TargetPath);
+            ErrorMessage = AppStrings.SearchFailedUserMessage;
             StatusMessage = ErrorMessage;
         }
         finally

@@ -10,6 +10,7 @@
                                              SecondaryColor="Blue" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <ResourceDictionary Source="Presentation/Themes/Colors.xaml" />
+                <ResourceDictionary Source="Presentation/Themes/Strings.xaml" />
                 <ResourceDictionary Source="Presentation/Themes/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

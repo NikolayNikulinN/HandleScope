@@ -1,6 +1,8 @@
 <Project Sdk="WixToolset.Sdk/6.0.2" ToolsVersion="4.0">
   <PropertyGroup>
+    <OutputType>Package</OutputType>
     <OutputName>HandleScopeSetup</OutputName>
+    <Platforms>x64</Platforms>
     <InstallerPlatform>x64</InstallerPlatform>
     <InstallerProductVersion>1.0.0</InstallerProductVersion>
     <Manufacturer>HandleScope</Manufacturer>

@@ -1,4 +1,5 @@
 using HandleScope.Application.Services;
+using HandleScope.Domain;
 using HandleScope.Domain.Results;
 using Serilog;
 
@@ -17,7 +18,7 @@ public sealed class SystemProcessActionService : IProcessActionService
     {
         if (processId == Environment.ProcessId)
         {
-            return new ProcessActionResult(false, "HandleScope cannot terminate itself.");
+            return new ProcessActionResult(false, AppStrings.CannotTerminateSelfMessage);
         }
 
         try
@@ -25,38 +26,38 @@ public sealed class SystemProcessActionService : IProcessActionService
             using var process = System.Diagnostics.Process.GetProcessById(processId);
             var processName = process.ProcessName;
 
-            _logger.Warning("Process termination requested for PID {ProcessId} ({ProcessName})", processId, processName);
+            _logger.Warning(AppStrings.ProcessTerminationRequestedLogTemplate, processId, processName);
 
             if (process.HasExited)
             {
-                return new ProcessActionResult(true, $"Process {processName} has already exited.");
+                return new ProcessActionResult(true, string.Format(AppStrings.ProcessAlreadyExitedFormat, processName));
             }
 
             if (process.CloseMainWindow())
             {
-                _logger.Information("Sent close request to PID {ProcessId} ({ProcessName})", processId, processName);
+                _logger.Information(AppStrings.ProcessCloseRequestedLogTemplate, processId, processName);
 
                 if (await WaitForExitAsync(process, TimeSpan.FromSeconds(3), cancellationToken))
                 {
-                    return new ProcessActionResult(true, $"Process {processName} was closed.");
+                    return new ProcessActionResult(true, string.Format(AppStrings.ProcessClosedFormat, processName));
                 }
             }
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger.Warning("Force terminating PID {ProcessId} ({ProcessName})", processId, processName);
+            _logger.Warning(AppStrings.ProcessForceTerminatingLogTemplate, processId, processName);
             process.Kill(entireProcessTree: true);
 
             if (await WaitForExitAsync(process, TimeSpan.FromSeconds(5), cancellationToken))
             {
-                return new ProcessActionResult(true, $"Process {processName} was terminated.");
+                return new ProcessActionResult(true, string.Format(AppStrings.ProcessTerminatedFormat, processName));
             }
 
-            return new ProcessActionResult(false, $"Process {processName} did not exit in time.");
+            return new ProcessActionResult(false, string.Format(AppStrings.ProcessDidNotExitFormat, processName));
         }
         catch (ArgumentException)
         {
-            return new ProcessActionResult(true, $"PID {processId} is no longer running.");
+            return new ProcessActionResult(true, string.Format(AppStrings.ProcessNoLongerRunningFormat, processId));
         }
         catch (OperationCanceledException)
         {
@@ -64,8 +65,8 @@ public sealed class SystemProcessActionService : IProcessActionService
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Failed to terminate PID {ProcessId}", processId);
-            return new ProcessActionResult(false, $"Failed to terminate PID {processId}: {ex.Message}");
+            _logger.Error(ex, AppStrings.ProcessTerminationFailedLogTemplate, processId);
+            return new ProcessActionResult(false, string.Format(AppStrings.ProcessTerminationFailedFormat, processId, ex.Message));
         }
     }
 

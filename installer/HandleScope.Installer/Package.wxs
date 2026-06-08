@@ -8,8 +8,8 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
     <MediaTemplate EmbedCab="yes" />
-    <Icon Id="HandleScopeInstallerIcon" SourceFile="..\..\src\HandleScope\Images\HscopeTitle.png" />
-    <Property Id="ARPPRODUCTICON" Value="HandleScopeInstallerIcon" />
+    <Icon Id="HandleScopeInstallerIcon.ico" SourceFile="..\..\src\HandleScope\Images\HandleScope.ico" />
+    <Property Id="ARPPRODUCTICON" Value="HandleScopeInstallerIcon.ico" />
 
     <Feature Id="MainFeature" Title="HandleScope" Level="1">
       <ComponentGroupRef Id="ApplicationComponents" />
@@ -103,7 +103,8 @@
           Id="StartMenuShortcut"
           Name="HandleScope"
           Description="Find processes locking files and folders."
-          Icon="HandleScopeInstallerIcon"
+          Icon="HandleScopeInstallerIcon.ico"
+          IconIndex="0"
           Target="[INSTALLFOLDER]HandleScope.exe"
           WorkingDirectory="INSTALLFOLDER" />
         <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
@@ -123,7 +124,8 @@
           Id="DesktopShortcut"
           Name="HandleScope"
           Description="Find processes locking files and folders."
-          Icon="HandleScopeInstallerIcon"
+          Icon="HandleScopeInstallerIcon.ico"
+          IconIndex="0"
           Target="[INSTALLFOLDER]HandleScope.exe"
           WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue
