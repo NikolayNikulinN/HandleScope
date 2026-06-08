@@ -6,13 +6,13 @@ The project currently targets `WixToolset.Sdk/6.0.2`.
 ## Build
 
 ```powershell
-dotnet build .\HandleScope\Installer\HandleScope.Installer.wixproj -c Release
+dotnet build .\installer\HandleScope.Installer\HandleScope.Installer.wixproj -c Release
 ```
 
 The MSI is written to:
 
 ```text
-HandleScope\Installer\bin\x64\Release\HandleScopeSetup.msi
+installer\HandleScope.Installer\bin\Release\HandleScopeSetup.msi
 ```
 
 ## Runtime prerequisite

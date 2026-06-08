@@ -8,10 +8,13 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
     <MediaTemplate EmbedCab="yes" />
+    <Icon Id="HandleScopeInstallerIcon" SourceFile="..\..\src\HandleScope\Images\HscopeTitle.png" />
+    <Property Id="ARPPRODUCTICON" Value="HandleScopeInstallerIcon" />
 
     <Feature Id="MainFeature" Title="HandleScope" Level="1">
       <ComponentGroupRef Id="ApplicationComponents" />
       <ComponentRef Id="StartMenuShortcutComponent" />
+      <ComponentRef Id="DesktopShortcutComponent" />
     </Feature>
   </Package>
 
@@ -23,6 +26,8 @@
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ApplicationProgramsFolder" Name="HandleScope" />
     </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
   </Fragment>
 
   <Fragment>
@@ -43,8 +48,28 @@
         <File Source="$(var.HandleScope.TargetDir)HandleScope.runtimeconfig.json" KeyPath="yes" />
       </Component>
 
+      <Component Id="HandleScopeApplicationComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.Application.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="HandleScopeDomainComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.Domain.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="HandleScopeInfrastructureComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.Infrastructure.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="CommunityToolkitMvvmComponent">
         <File Source="$(var.HandleScope.TargetDir)CommunityToolkit.Mvvm.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="MaterialDesignThemesComponent">
+        <File Source="$(var.HandleScope.TargetDir)MaterialDesignThemes.Wpf.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="MaterialDesignColorsComponent">
+        <File Source="$(var.HandleScope.TargetDir)MaterialDesignColors.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="DependencyInjectionAbstractionsComponent">
@@ -53,6 +78,10 @@
 
       <Component Id="DependencyInjectionComponent">
         <File Source="$(var.HandleScope.TargetDir)Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="XamlBehaviorsComponent">
+        <File Source="$(var.HandleScope.TargetDir)Microsoft.Xaml.Behaviors.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="SerilogComponent">
@@ -74,6 +103,7 @@
           Id="StartMenuShortcut"
           Name="HandleScope"
           Description="Find processes locking files and folders."
+          Icon="HandleScopeInstallerIcon"
           Target="[INSTALLFOLDER]HandleScope.exe"
           WorkingDirectory="INSTALLFOLDER" />
         <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
@@ -86,5 +116,24 @@
           KeyPath="yes" />
       </Component>
     </DirectoryRef>
+
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcutComponent">
+        <Shortcut
+          Id="DesktopShortcut"
+          Name="HandleScope"
+          Description="Find processes locking files and folders."
+          Icon="HandleScopeInstallerIcon"
+          Target="[INSTALLFOLDER]HandleScope.exe"
+          WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\HandleScope"
+          Name="DesktopShortcut"
+          Type="integer"
+          Value="1"
+          KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
   </Fragment>
 </Wix>
