@@ -30,4 +30,8 @@
     <ProjectReference Include="..\HandleScope.Infrastructure\HandleScope.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Docs\Images\" />
+  </ItemGroup>
+
 </Project>

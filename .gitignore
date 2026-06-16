@@ -6,6 +6,7 @@ obj/
 *.rsuser
 *.userosscache
 *.sln.docstates
+**/UpgradeLog.htm
 
 TestResults/
 coverage/
