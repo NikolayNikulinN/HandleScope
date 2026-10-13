@@ -1,6 +1,7 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HandleScope.Application.Services;
+using HandleScope.Presentation.Abstract;
 using HandleScope.Domain;
 using HandleScope.Domain.Enums;
 using HandleScope.Domain.Models;
@@ -9,24 +10,19 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 
-namespace HandleScope.Presentation.ViewModels;
+namespace HandleScope.ViewModels;
 
-public sealed partial class MainWindowViewModel : ObservableObject
+/// <summary>Provides search commands and results for the home page.</summary>
+public sealed partial class HomeViewModel : ObservableObject
 {
-    private static readonly HandleSearchModeOption FileSearchMode = new(AppStrings.FileSearchModeDisplayName, HandleSearchMode.File);
-    private static readonly HandleSearchModeOption DirectorySearchMode = new(AppStrings.DirectorySearchModeDisplayName, HandleSearchMode.Directory);
-
     private readonly IHandleSearchService _handleSearchService;
     private readonly IProcessActionService _processActionService;
     private readonly ILogger _logger;
+    private readonly IResourceWrapper _resourceWrapper;
     private CancellationTokenSource? _searchCancellation;
     private HandleSearchRequest? _lastSearchRequest;
 
-    public IReadOnlyList<HandleSearchModeOption> SearchModes { get; } =
-    [
-        FileSearchMode,
-        DirectorySearchMode
-    ];
+    public IReadOnlyList<HandleSearchModeOption> SearchModes { get; }
 
     public ObservableCollection<HandleLockInfo> Results { get; } = [];
 
@@ -38,7 +34,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDirectorySearchMode))]
-    private HandleSearchModeOption _selectedSearchMode = FileSearchMode;
+    private HandleSearchModeOption _selectedSearchMode = null!;
 
     [ObservableProperty]
     private bool _includeChildren = true;
@@ -49,6 +45,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(CancelSearchCommand))]
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
+    [NotifyPropertyChangedFor(nameof(IsIdle))]
     private bool _isSearching;
 
     [ObservableProperty]
@@ -56,6 +53,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
+    [NotifyPropertyChangedFor(nameof(IsIdle))]
     private bool _isEndingProcess;
 
     [ObservableProperty]
@@ -63,11 +61,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private HandleLockInfo? _selectedResult;
 
     [ObservableProperty]
-    private string _statusMessage = AppStrings.InitialStatusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
+
+    public IResourceWrapper ResourceWrapper => _resourceWrapper;
+
+    public bool IsIdle => !IsSearching && !IsEndingProcess;
 
     public bool HasResults => Results.Count > 0;
 
@@ -77,14 +79,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public bool IsDirectorySearchMode => SelectedSearchMode.Mode == HandleSearchMode.Directory;
 
-    public MainWindowViewModel(
-        IHandleSearchService handleSearchService,
-        IProcessActionService processActionService,
-        ILogger logger)
+    public HomeViewModel(IHandleSearchService handleSearchService,
+                         IProcessActionService processActionService,
+                         ILogger logger,
+                         IResourceWrapper resourceWrapper)
     {
         _handleSearchService = handleSearchService;
         _processActionService = processActionService;
-        _logger = logger.ForContext<MainWindowViewModel>();
+        _logger = logger.ForContext<HomeViewModel>();
+        _resourceWrapper = resourceWrapper;
+        var fileMode = new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.FileSearchModeDisplayName), HandleSearchMode.File);
+        SearchModes = [fileMode,
+                       new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.DirectorySearchModeDisplayName), HandleSearchMode.Directory)];
+        _selectedSearchMode = fileMode;
+        _statusMessage = resourceWrapper.Get(UiTextKey.InitialStatusMessage);
     }
 
     [RelayCommand(CanExecute = nameof(CanSearch))]
@@ -116,7 +124,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = AppStrings.SelectTargetFolderDescription,
+                Description = _resourceWrapper.Get(UiTextKey.SelectTargetFolderDescription),
                 UseDescriptionForTitle = true,
                 SelectedPath = Directory.Exists(TargetPath) ? TargetPath : string.Empty
             };
@@ -133,7 +141,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             CheckFileExists = false,
             CheckPathExists = true,
-            Title = AppStrings.SelectTargetFileTitle
+            Title = _resourceWrapper.Get(UiTextKey.SelectTargetFileTitle)
         };
 
         if (fileDialog.ShowDialog() == true)
@@ -158,8 +166,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         var selected = SelectedResult;
         var confirmation = System.Windows.MessageBox.Show(
-            string.Format(AppStrings.ConfirmProcessTerminationFormat, selected.ProcessName, selected.ProcessId),
-            AppStrings.ConfirmProcessTerminationTitle,
+            string.Format(_resourceWrapper.Get(UiTextKey.ConfirmProcessTerminationFormat), selected.ProcessName, selected.ProcessId),
+            _resourceWrapper.Get(UiTextKey.ConfirmProcessTerminationTitle),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning,
             MessageBoxResult.No);
@@ -173,7 +181,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             IsEndingProcess = true;
             ErrorMessage = null;
-            StatusMessage = string.Format(AppStrings.EndingProcessStatusFormat, selected.ProcessName);
+            StatusMessage = string.Format(_resourceWrapper.Get(UiTextKey.EndingProcessStatusFormat), selected.ProcessName);
 
             var result = await _processActionService.CloseProcessAsync(selected.ProcessId, CancellationToken.None);
             StatusMessage = result.Message;
@@ -195,7 +203,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.Error(ex, AppStrings.EndProcessFailedLogTemplate, selected.ProcessId);
-            ErrorMessage = AppStrings.EndProcessFailedUserMessage;
+            ErrorMessage = _resourceWrapper.Get(UiTextKey.EndProcessFailedUserMessage);
             StatusMessage = ErrorMessage;
         }
         finally
@@ -218,7 +226,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         try
         {
             IsSearching = true;
-            StatusMessage = AppStrings.SearchInProgressStatusMessage;
+            StatusMessage = _resourceWrapper.Get(UiTextKey.SearchInProgressStatusMessage);
 
             if (rememberRequest)
             {
@@ -247,17 +255,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
             NotifyCollectionStateChanged();
 
             StatusMessage = result.Items.Count == 0
-                ? AppStrings.NoLockingProcessesFoundStatusMessage
-                : string.Format(AppStrings.LockingProcessEntriesFoundFormat, result.Items.Count);
+                ? _resourceWrapper.Get(UiTextKey.NoLockingProcessesFoundStatusMessage)
+                : string.Format(_resourceWrapper.Get(UiTextKey.LockingProcessEntriesFoundFormat), result.Items.Count);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = AppStrings.SearchCancelledStatusMessage;
+            StatusMessage = _resourceWrapper.Get(UiTextKey.SearchCancelledStatusMessage);
         }
         catch (Exception ex)
         {
             _logger.Error(ex, AppStrings.SearchFailedLogTemplate, request.TargetPath);
-            ErrorMessage = AppStrings.SearchFailedUserMessage;
+            ErrorMessage = _resourceWrapper.Get(UiTextKey.SearchFailedUserMessage);
             StatusMessage = ErrorMessage;
         }
         finally
@@ -301,4 +309,5 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 }
 
+/// <summary>Describes a selectable search mode.</summary>
 public sealed record HandleSearchModeOption(string DisplayName, HandleSearchMode Mode);

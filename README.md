@@ -2,7 +2,7 @@
 
 Windows File Lock Detection Utility
 
-![HandleScope main window](HandleScope/Docs/Images/main-window.png)
+![HandleScope main window](HandleScope.Presentation/Images/main-window.png)
 
 HandleScope is a Windows desktop utility that identifies processes locking files and folders, helping users quickly discover why resources cannot be deleted, moved, renamed, or modified.
 

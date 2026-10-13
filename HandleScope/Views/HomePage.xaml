@@ -1,18 +1,14 @@
-<Window x:Class="HandleScope.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="{StaticResource String.AppTitle}"
-        Height="620"
-        MinHeight="520"
-        Width="1040"
-        MinWidth="860"
-        WindowStartupLocation="CenterScreen">
-    <Window.Resources>
+﻿<UserControl x:Class="HandleScope.Views.HomePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:HandleScope.ViewModels"
+             d:DataContext="{d:DesignInstance Type=viewModels:HomeViewModel}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </Window.Resources>
+    </UserControl.Resources>
 
     <Grid Margin="24">
         <Grid.RowDefinitions>
@@ -23,10 +19,10 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock FontSize="28" FontWeight="SemiBold" Text="{StaticResource String.AppTitle}" />
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding AppTitle, Source={StaticResource ResourceWrapper}}" />
             <TextBlock Margin="0,4,0,0"
                        Foreground="{StaticResource Brush.TextSecondary}"
-                       Text="{StaticResource String.AppSubtitle}" />
+                       Text="{Binding AppSubtitle, Source={StaticResource ResourceWrapper}}" />
         </StackPanel>
 
         <Border Grid.Row="1"
@@ -57,26 +53,26 @@
                 <Button Grid.Column="1"
                         Margin="0,0,8,0"
                         Command="{Binding BrowseCommand}"
-                        Content="{StaticResource String.Button.Browse}" />
+                        Content="{Binding BrowseButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="2"
                         Margin="0,0,8,0"
                         Command="{Binding SearchCommand}"
-                        Content="{StaticResource String.Button.Search}" />
+                        Content="{Binding SearchButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="3"
                         Margin="0,0,8,0"
                         Command="{Binding RefreshCommand}"
-                        Content="{StaticResource String.Button.Refresh}" />
+                        Content="{Binding RefreshButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="4"
                         Margin="0,0,8,0"
                         Command="{Binding EndSelectedProcessCommand}"
-                        Content="{StaticResource String.Button.EndProcess}" />
+                        Content="{Binding EndProcessButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="5"
                         Command="{Binding CancelSearchCommand}"
-                        Content="{StaticResource String.Button.Cancel}" />
+                        Content="{Binding CancelButton, Source={StaticResource ResourceWrapper}}" />
 
                 <StackPanel Grid.Row="1"
                             Grid.ColumnSpan="6"
@@ -85,14 +81,14 @@
                     <TextBlock Margin="0,0,8,0"
                                VerticalAlignment="Center"
                                Foreground="{StaticResource Brush.TextSecondary}"
-                               Text="{StaticResource String.Label.Mode}" />
+                               Text="{Binding ModeLabel, Source={StaticResource ResourceWrapper}}" />
                     <ComboBox Width="140"
                               DisplayMemberPath="DisplayName"
                               ItemsSource="{Binding SearchModes}"
                               SelectedItem="{Binding SelectedSearchMode}" />
                     <CheckBox Margin="24,0,0,0"
                               VerticalAlignment="Center"
-                              Content="{StaticResource String.CheckBox.IncludeChildPaths}"
+                              Content="{Binding IncludeChildPaths, Source={StaticResource ResourceWrapper}}"
                               IsChecked="{Binding IncludeChildren}"
                               IsEnabled="{Binding IsDirectorySearchMode}" />
                 </StackPanel>
@@ -107,13 +103,13 @@
                 <DataGrid ItemsSource="{Binding Results}"
                           SelectedItem="{Binding SelectedResult}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding ProcessName}" Header="{StaticResource String.Grid.Process}" Width="2*" />
-                    <DataGridTextColumn Binding="{Binding ProcessId}" Header="{StaticResource String.Grid.ProcessId}" Width="90" />
-                    <DataGridTextColumn Binding="{Binding UserName}" Header="{StaticResource String.Grid.User}" Width="160" />
-                    <DataGridTextColumn Binding="{Binding ProcessPath}" Header="{StaticResource String.Grid.ExecutablePath}" Width="3*" />
-                    <DataGridTextColumn Binding="{Binding LockedPath}" Header="{StaticResource String.Grid.LockedPath}" Width="3*" />
-                    <DataGridTextColumn Binding="{Binding HandleType}" Header="{StaticResource String.Grid.HandleType}" Width="120" />
-                    <DataGridTextColumn Binding="{Binding Access}" Header="{StaticResource String.Grid.Access}" Width="120" />
+                    <DataGridTextColumn Binding="{Binding ProcessName}" Header="{Binding GridProcess, Source={StaticResource ResourceWrapper}}" Width="2*" />
+                    <DataGridTextColumn Binding="{Binding ProcessId}" Header="{Binding GridProcessId, Source={StaticResource ResourceWrapper}}" Width="90" />
+                    <DataGridTextColumn Binding="{Binding UserName}" Header="{Binding GridUser, Source={StaticResource ResourceWrapper}}" Width="160" />
+                    <DataGridTextColumn Binding="{Binding ProcessPath}" Header="{Binding GridExecutablePath, Source={StaticResource ResourceWrapper}}" Width="3*" />
+                    <DataGridTextColumn Binding="{Binding LockedPath}" Header="{Binding GridLockedPath, Source={StaticResource ResourceWrapper}}" Width="3*" />
+                    <DataGridTextColumn Binding="{Binding HandleType}" Header="{Binding GridHandleType, Source={StaticResource ResourceWrapper}}" Width="120" />
+                    <DataGridTextColumn Binding="{Binding Access}" Header="{Binding GridAccess, Source={StaticResource ResourceWrapper}}" Width="120" />
                 </DataGrid.Columns>
             </DataGrid>
             </Border>
@@ -179,4 +175,4 @@
             </Border>
         </StackPanel>
     </Grid>
-</Window>
+</UserControl>

@@ -1,0 +1,99 @@
+<ui:FluentWindow x:Class="HandleScope.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:viewModels="clr-namespace:HandleScope.ViewModels"
+                 d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
+                 Title="{Binding ResourceWrapper.AppTitle}"
+                 Width="1040"
+                 Height="620"
+                 MinWidth="860"
+                 MinHeight="520"
+                 Icon="{Binding AppConstants.Images.AppIconIcoPath}"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica"
+                 WindowCornerPreference="Round"
+                 ResizeMode="CanResize"
+                 StateChanged="WindowStateChanged"
+                 Closing="WindowClosing"
+                 mc:Ignorable="d">
+    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Background="{DynamicResource LayerFillColorDefaultBrush}"
+                  MouseLeftButtonDown="TitleBarMouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                    <Image Width="30"
+                           Height="30"
+                           Source="{Binding AppConstants.Images.AppIconPath}"
+                           Stretch="Uniform" />
+                    <TextBlock Margin="10,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Text="{Binding ResourceWrapper.AppTitle}" />
+                </StackPanel>
+
+                <Border Grid.ColumnSpan="2"
+                        Height="1"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource ControlStrokeColorDefaultBrush}" />
+
+                <StackPanel Grid.Column="1"
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                    <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
+                               Click="MinimizeButtonClick"
+                               ToolTip="{Binding ResourceWrapper.MinimizeToolTip}">
+                        <Image Width="22"
+                               Height="22"
+                               Source="{Binding AppConstants.Images.MinimizePath}"
+                               Stretch="Uniform" />
+                    </ui:Button>
+
+                    <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
+                               Click="MaximizeRestoreButtonClick"
+                               ToolTip="{Binding MaximizeRestoreToolTip}">
+                        <Image Width="22"
+                               Height="22"
+                               Source="{Binding MaximizeRestoreIconPath}"
+                               Stretch="Uniform" />
+                    </ui:Button>
+
+                    <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
+                               Click="CloseButtonClick"
+                               IsEnabled="{Binding CanCloseApplication}"
+                               ToolTip="{Binding CloseButtonToolTip}"
+                               ToolTipService.ShowOnDisabled="True">
+                        <Image Width="22"
+                               Height="22"
+                               Source="{Binding AppConstants.Images.ClosePath}"
+                               Stretch="Uniform" />
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
+
+            <ContentControl Grid.Row="1"
+                            Content="{Binding ActivePage}" />
+        </Grid>
+    </Border>
+</ui:FluentWindow>

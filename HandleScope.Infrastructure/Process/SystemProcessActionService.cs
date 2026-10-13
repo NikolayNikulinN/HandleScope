@@ -8,17 +8,19 @@ namespace HandleScope.Infrastructure.Process;
 public sealed class SystemProcessActionService : IProcessActionService
 {
     private readonly ILogger _logger;
+    private readonly IUiText _uiText;
 
-    public SystemProcessActionService(ILogger logger)
+    public SystemProcessActionService(ILogger logger, IUiText uiText)
     {
         _logger = logger.ForContext<SystemProcessActionService>();
+        _uiText = uiText;
     }
 
     public async Task<ProcessActionResult> CloseProcessAsync(int processId, CancellationToken cancellationToken)
     {
         if (processId == Environment.ProcessId)
         {
-            return new ProcessActionResult(false, AppStrings.CannotTerminateSelfMessage);
+            return new ProcessActionResult(false, _uiText.Get(UiTextKey.CannotTerminateSelfMessage));
         }
 
         try
@@ -30,7 +32,7 @@ public sealed class SystemProcessActionService : IProcessActionService
 
             if (process.HasExited)
             {
-                return new ProcessActionResult(true, string.Format(AppStrings.ProcessAlreadyExitedFormat, processName));
+                return new ProcessActionResult(true, string.Format(_uiText.Get(UiTextKey.ProcessAlreadyExitedFormat), processName));
             }
 
             if (process.CloseMainWindow())
@@ -39,7 +41,7 @@ public sealed class SystemProcessActionService : IProcessActionService
 
                 if (await WaitForExitAsync(process, TimeSpan.FromSeconds(3), cancellationToken))
                 {
-                    return new ProcessActionResult(true, string.Format(AppStrings.ProcessClosedFormat, processName));
+                    return new ProcessActionResult(true, string.Format(_uiText.Get(UiTextKey.ProcessClosedFormat), processName));
                 }
             }
 
@@ -50,14 +52,14 @@ public sealed class SystemProcessActionService : IProcessActionService
 
             if (await WaitForExitAsync(process, TimeSpan.FromSeconds(5), cancellationToken))
             {
-                return new ProcessActionResult(true, string.Format(AppStrings.ProcessTerminatedFormat, processName));
+                return new ProcessActionResult(true, string.Format(_uiText.Get(UiTextKey.ProcessTerminatedFormat), processName));
             }
 
-            return new ProcessActionResult(false, string.Format(AppStrings.ProcessDidNotExitFormat, processName));
+            return new ProcessActionResult(false, string.Format(_uiText.Get(UiTextKey.ProcessDidNotExitFormat), processName));
         }
         catch (ArgumentException)
         {
-            return new ProcessActionResult(true, string.Format(AppStrings.ProcessNoLongerRunningFormat, processId));
+            return new ProcessActionResult(true, string.Format(_uiText.Get(UiTextKey.ProcessNoLongerRunningFormat), processId));
         }
         catch (OperationCanceledException)
         {
@@ -66,7 +68,7 @@ public sealed class SystemProcessActionService : IProcessActionService
         catch (Exception ex)
         {
             _logger.Error(ex, AppStrings.ProcessTerminationFailedLogTemplate, processId);
-            return new ProcessActionResult(false, string.Format(AppStrings.ProcessTerminationFailedFormat, processId, ex.Message));
+            return new ProcessActionResult(false, string.Format(_uiText.Get(UiTextKey.ProcessTerminationFailedFormat), processId, ex.Message));
         }
     }
 

@@ -15,11 +15,13 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
     private readonly IProcessInfoService _processInfoService;
     private readonly ILogger _logger;
+    private readonly IUiText _uiText;
 
-    public RestartManagerHandleSearchService(IProcessInfoService processInfoService, ILogger logger)
+    public RestartManagerHandleSearchService(IProcessInfoService processInfoService, ILogger logger, IUiText uiText)
     {
         _processInfoService = processInfoService;
         _logger = logger.ForContext<RestartManagerHandleSearchService>();
+        _uiText = uiText;
     }
 
     public Task<HandleSearchResult> SearchAsync(HandleSearchRequest request, CancellationToken cancellationToken)
@@ -42,7 +44,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
         var error = RestartManagerNativeMethods.RmStartSession(out var sessionHandle, 0, sessionKey);
         if (error != RestartManagerNativeMethods.ErrorSuccess)
         {
-            throw new Win32Exception(error, AppStrings.RestartManagerStartSessionFailed);
+            throw new Win32Exception(error, _uiText.Get(UiTextKey.RestartManagerStartSessionFailed));
         }
 
         try
@@ -60,7 +62,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (error != RestartManagerNativeMethods.ErrorSuccess)
             {
-                throw new Win32Exception(error, AppStrings.RestartManagerRegisterResourcesFailed);
+                throw new Win32Exception(error, _uiText.Get(UiTextKey.RestartManagerRegisterResourcesFailed));
             }
 
             var processInfoNeeded = 0u;
@@ -88,7 +90,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
                 if (error != RestartManagerNativeMethods.ErrorSuccess)
                 {
-                    throw new Win32Exception(error, AppStrings.RestartManagerGetLockingProcessListFailed);
+                    throw new Win32Exception(error, _uiText.Get(UiTextKey.RestartManagerGetLockingProcessListFailed));
                 }
 
                 var items = CreateResults(affectedApplications.Take((int)processInfoCount), request, resources);
@@ -103,7 +105,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (error != RestartManagerNativeMethods.ErrorSuccess)
             {
-                throw new Win32Exception(error, AppStrings.RestartManagerGetLockingProcessListFailed);
+                throw new Win32Exception(error, _uiText.Get(UiTextKey.RestartManagerGetLockingProcessListFailed));
             }
 
             LogCompletion(request, resources.Count, 0);
@@ -149,7 +151,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
                 details.UserName,
                 lockedPath,
                 application.ApplicationType.ToString(),
-                AppStrings.RestartManagerSourceName));
+                _uiText.Get(UiTextKey.RestartManagerSourceName)));
         }
 
         return results
@@ -158,7 +160,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
             .ToArray();
     }
 
-    private static IReadOnlyList<string> BuildResourceList(HandleSearchRequest request, List<string> warnings)
+    private IReadOnlyList<string> BuildResourceList(HandleSearchRequest request, List<string> warnings)
     {
         var targetPath = NormalizePath(request.TargetPath);
 
@@ -166,7 +168,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
         {
             if (!File.Exists(targetPath))
             {
-                warnings.Add(AppStrings.TargetFileMissingWarning);
+                warnings.Add(_uiText.Get(UiTextKey.TargetFileMissingWarning));
                 return Array.Empty<string>();
             }
 
@@ -175,7 +177,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
         if (!Directory.Exists(targetPath))
         {
-            warnings.Add(AppStrings.TargetFolderMissingWarning);
+            warnings.Add(_uiText.Get(UiTextKey.TargetFolderMissingWarning));
             return Array.Empty<string>();
         }
 
@@ -193,14 +195,14 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             if (resources.Count >= MaxFolderResources)
             {
-                warnings.Add(string.Format(AppStrings.FolderSearchLimitedFormat, MaxFolderResources));
+                warnings.Add(string.Format(_uiText.Get(UiTextKey.FolderSearchLimitedFormat), MaxFolderResources));
                 break;
             }
         }
 
         if (resources.Count == 0)
         {
-            warnings.Add(AppStrings.EmptyFolderWarning);
+            warnings.Add(_uiText.Get(UiTextKey.EmptyFolderWarning));
         }
 
         return resources;

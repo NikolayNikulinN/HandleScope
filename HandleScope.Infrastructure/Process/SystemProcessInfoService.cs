@@ -8,10 +8,12 @@ namespace HandleScope.Infrastructure.Process;
 public sealed class SystemProcessInfoService : IProcessInfoService
 {
     private readonly ILogger _logger;
+    private readonly IUiText _uiText;
 
-    public SystemProcessInfoService(ILogger logger)
+    public SystemProcessInfoService(ILogger logger, IUiText uiText)
     {
         _logger = logger.ForContext<SystemProcessInfoService>();
+        _uiText = uiText;
     }
 
     public ProcessDetails GetProcessDetails(int processId)
@@ -29,7 +31,7 @@ public sealed class SystemProcessInfoService : IProcessInfoService
         catch (Exception ex)
         {
             _logger.Warning(ex, AppStrings.ProcessDetailsResolveFailedLogTemplate, processId);
-            return new ProcessDetails(processId, string.Format(AppStrings.ProcessDetailsFallbackNameFormat, processId), null, null);
+            return new ProcessDetails(processId, string.Format(_uiText.Get(UiTextKey.ProcessDetailsFallbackNameFormat), processId), null, null);
         }
     }
 

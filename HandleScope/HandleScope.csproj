@@ -7,12 +7,33 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>Images\HandleScope.ico</ApplicationIcon>
+    <ApplicationIcon>..\HandleScope.Presentation\Images\appIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Images\HandleScope.ico" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Noto\NotoSans-Bold.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Noto\NotoSans-BoldItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Noto\NotoSans-Italic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Noto\NotoSans-Regular.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Black.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-BlackItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Bold.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-BoldItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Italic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Light.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-LightItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Medium.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-MediumItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Regular.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-Thin.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\Roboto-ThinItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-Bold.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-BoldItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-Italic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-Light.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-LightItalic.ttf" />
+    <Content Remove="C:\Users\Nick\.nuget\packages\materialdesignthemes\5.3.2\contentFiles\any\net8.0-windows7.0\Resources\Roboto\RobotoCondensed-Regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,12 +43,14 @@
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HandleScope.Application\HandleScope.Application.csproj" />
     <ProjectReference Include="..\HandleScope.Domain\HandleScope.Domain.csproj" />
     <ProjectReference Include="..\HandleScope.Infrastructure\HandleScope.Infrastructure.csproj" />
+    <ProjectReference Include="..\HandleScope.Presentation\HandleScope.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
