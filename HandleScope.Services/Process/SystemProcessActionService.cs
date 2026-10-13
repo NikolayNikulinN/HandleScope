@@ -22,6 +22,7 @@ public sealed class SystemProcessActionService : IProcessActionService
     /// <inheritdoc />
     public async Task<ProcessActionResult> CloseProcessAsync(int processId, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (processId == Environment.ProcessId)
         {
             return new ProcessActionResult(false, uiText.Get(UiTextKey.CannotTerminateSelfMessage));
@@ -81,12 +82,15 @@ public sealed class SystemProcessActionService : IProcessActionService
         TimeSpan timeout,
         CancellationToken cancellationToken)
     {
+        using var timeoutCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCancellation.CancelAfter(timeout);
+
         try
         {
-            await process.WaitForExitAsync(cancellationToken).WaitAsync(timeout, cancellationToken);
+            await process.WaitForExitAsync(timeoutCancellation.Token);
             return true;
         }
-        catch (TimeoutException)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             return false;
         }

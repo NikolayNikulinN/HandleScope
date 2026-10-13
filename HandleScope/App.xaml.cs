@@ -1,5 +1,6 @@
 using System.Windows;
 using HandleScope.Services.Abstract;
+using HandleScope.Logger.Configuration;
 using HandleScope.Logger.Constants;
 using HandleScope.Services.Native;
 using HandleScope.Services.Process;
@@ -21,14 +22,7 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .Enrich.FromLogContext()
-            .WriteTo.Debug()
-            .WriteTo.File(LogConstants.LogFilePath,
-                          rollingInterval: RollingInterval.Day,
-                          retainedFileCountLimit: 14)
-            .CreateLogger();
+        FileLoggerConfigurator.GetLogger();
         Log.Information(LogConstants.ApplicationStartingLogMessage);
 
         var services = new ServiceCollection();
@@ -47,7 +41,7 @@ public partial class App : System.Windows.Application
     {
         Log.Information(LogConstants.ApplicationShuttingDownLogMessage);
         serviceProvider?.Dispose();
-        Log.CloseAndFlush();
+        FileLoggerConfigurator.CloseAndFlush();
         base.OnExit(e);
     }
 

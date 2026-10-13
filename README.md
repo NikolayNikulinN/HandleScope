@@ -82,13 +82,19 @@ HandleScope.Installer
 Build the MSI installer:
 
 ```powershell
-dotnet build .\HandleScope.Installer\HandleScope.Installer.wixproj -c Release
+dotnet build .\HandleScope.sln -c Debug -p:Platform=x86
+dotnet build .\HandleScope.sln -c Debug -p:Platform=x64
+dotnet build .\HandleScope.sln -c Release -p:Platform=x86
+dotnet build .\HandleScope.sln -c Release -p:Platform=x64
 ```
 
 The generated MSI package is created in:
 
 ```text
-HandleScope.Installer\bin\Release\HandleScopeSetup.msi
+HandleScope.Installer\bin\Debug\x86\HandleScopeSetup.msi
+HandleScope.Installer\bin\Debug\x64\HandleScopeSetup.msi
+HandleScope.Installer\bin\Release\x86\HandleScopeSetup.msi
+HandleScope.Installer\bin\Release\x64\HandleScopeSetup.msi
 ```
 
 The installer:
@@ -110,11 +116,13 @@ HandleScope.Installer/       WiX MSI installer project
 
 ## Logging
 
-Application logs are stored in:
+When run from the repository, application logs are stored in:
 
 ```text
-%LOCALAPPDATA%\HandleScope\Logs
+<solution root>\Logs
 ```
+
+When installed, the app uses `Logs` next to `HandleScope.exe`. If that directory is not writable, it uses `%LOCALAPPDATA%\HandleScope\Logs`.
 
 ## Note
 

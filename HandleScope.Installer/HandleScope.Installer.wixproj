@@ -2,13 +2,21 @@
   <PropertyGroup>
     <OutputType>Package</OutputType>
     <OutputName>HandleScopeSetup</OutputName>
-    <Platforms>x64</Platforms>
-    <InstallerPlatform>x64</InstallerPlatform>
+    <Platforms>x64;x86</Platforms>
+    <InstallerPlatform Condition="'$(Platform)' == 'x86'">x86</InstallerPlatform>
+    <InstallerPlatform Condition="'$(InstallerPlatform)' == ''">x64</InstallerPlatform>
+    <OutputPlatform Condition="'$(Platform)' == 'x86'">x86</OutputPlatform>
+    <OutputPlatform Condition="'$(OutputPlatform)' == ''">x64</OutputPlatform>
+    <OutputPath>bin\$(Configuration)\$(OutputPlatform)\</OutputPath>
+    <OutDir>$(MSBuildProjectDirectory)\$(OutputPath)</OutDir>
+    <InstallRootDirectory Condition="'$(InstallerPlatform)' == 'x86'">ProgramFilesFolder</InstallRootDirectory>
+    <InstallRootDirectory Condition="'$(InstallRootDirectory)' == ''">ProgramFiles64Folder</InstallRootDirectory>
     <InstallerProductVersion>1.0.0</InstallerProductVersion>
     <Manufacturer>HandleScope</Manufacturer>
     <DefineConstants>
       InstallerProductVersion=$(InstallerProductVersion);
-      Manufacturer=$(Manufacturer)
+      Manufacturer=$(Manufacturer);
+      InstallRootDirectory=$(InstallRootDirectory)
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>

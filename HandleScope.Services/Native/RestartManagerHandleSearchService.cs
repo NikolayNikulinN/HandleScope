@@ -28,20 +28,28 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
     /// <inheritdoc />
     public Task<HandleSearchResult> SearchAsync(HandleSearchRequest request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        return Task.Run(() => Search(request, cancellationToken), cancellationToken);
+    }
+
+    private HandleSearchResult Search(HandleSearchRequest request, CancellationToken cancellationToken)
+    {
         cancellationToken.ThrowIfCancellationRequested();
 
         var warnings = new List<string>();
-        var resources = BuildResourceList(request, warnings);
+        var resources = BuildResourceList(request, warnings, cancellationToken);
 
         if (resources.Count == 0)
         {
-            return Task.FromResult(new HandleSearchResult(
+            cancellationToken.ThrowIfCancellationRequested();
+            return new HandleSearchResult(
                 request.TargetPath,
                 DateTimeOffset.Now,
                 Array.Empty<HandleLockInfo>(),
-                warnings));
+                warnings);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         var sessionKey = new StringBuilder(ServiceConstants.SessionKeyCapacity);
         var error = RestartManagerNativeMethods.RmStartSession(out var sessionHandle, 0, sessionKey);
         if (error != ServiceConstants.ErrorSuccess)
@@ -77,6 +85,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
                 ref processInfoCount,
                 null,
                 ref rebootReasons);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (error == ServiceConstants.ErrorMoreData)
             {
@@ -89,20 +98,21 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
                     ref processInfoCount,
                     affectedApplications,
                     ref rebootReasons);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (error != ServiceConstants.ErrorSuccess)
                 {
                     throw new Win32Exception(error, uiText.Get(UiTextKey.RestartManagerGetLockingProcessListFailed));
                 }
 
-                var items = CreateResults(affectedApplications.Take((int)processInfoCount), request, resources);
+                var items = CreateResults(affectedApplications.Take((int)processInfoCount), request, resources, cancellationToken);
                 LogCompletion(request, resources.Count, items.Count);
 
-                return Task.FromResult(new HandleSearchResult(
+                return new HandleSearchResult(
                     request.TargetPath,
                     DateTimeOffset.Now,
                     items,
-                    warnings));
+                    warnings);
             }
 
             if (error != ServiceConstants.ErrorSuccess)
@@ -112,11 +122,11 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
             LogCompletion(request, resources.Count, 0);
 
-            return Task.FromResult(new HandleSearchResult(
+            return new HandleSearchResult(
                 request.TargetPath,
                 DateTimeOffset.Now,
                 Array.Empty<HandleLockInfo>(),
-                warnings));
+                warnings);
         }
         finally
         {
@@ -127,7 +137,8 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
     private IReadOnlyList<HandleLockInfo> CreateResults(
         IEnumerable<RestartManagerNativeMethods.RmProcessInfo> affectedApplications,
         HandleSearchRequest request,
-        IReadOnlyList<string> resources)
+        IReadOnlyList<string> resources,
+        CancellationToken cancellationToken)
     {
         var lockedPath = resources.Count == 1 ? resources[0] : NormalizePath(request.TargetPath);
         var results = new List<HandleLockInfo>();
@@ -135,6 +146,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
         foreach (var application in affectedApplications)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var processId = application.Process.ProcessId;
             if (processId <= 0 || !seen.Add(processId))
             {
@@ -162,7 +174,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
                     .ToArray();
     }
 
-    private IReadOnlyList<string> BuildResourceList(HandleSearchRequest request, List<string> warnings)
+    private IReadOnlyList<string> BuildResourceList(HandleSearchRequest request, List<string> warnings, CancellationToken cancellationToken)
     {
         var targetPath = NormalizePath(request.TargetPath);
 
@@ -193,6 +205,7 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
         foreach (var file in Directory.EnumerateFiles(targetPath, "*", options))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             resources.Add(NormalizePath(file));
 
             if (resources.Count >= ServiceConstants.MaxFolderResources)
@@ -212,17 +225,8 @@ public sealed class RestartManagerHandleSearchService : IHandleSearchService
 
     private static string NormalizePath(string path)
     {
-        var normalized = path.Trim().Replace('/', '\\');
-
-        try
-        {
-            normalized = Path.GetFullPath(normalized);
-        }
-        catch
-        {
-        }
-
-        return normalized.TrimEnd('\\');
+        var normalized = Path.GetFullPath(path.Trim().Replace('/', '\\'));
+        return Path.TrimEndingDirectorySeparator(normalized);
     }
 
     private void LogCompletion(HandleSearchRequest request, int resourceCount, int resultCount)

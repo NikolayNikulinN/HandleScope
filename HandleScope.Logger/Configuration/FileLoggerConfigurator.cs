@@ -1,39 +1,34 @@
 using HandleScope.Logger.Constants;
 using Serilog;
-using Serilog.Events;
 using System.Globalization;
 
 namespace HandleScope.Logger.Configuration;
 
-internal static class FileLoggerConfigurator
+/// <summary>Configures file logging in the application Logs directory.</summary>
+public static class FileLoggerConfigurator
 {
     private static readonly object SyncRoot = new();
     private static bool isConfigured;
-    private static string? logDirectoryPath;
 
+    /// <summary>Gets the configured application logger.</summary>
     public static ILogger GetLogger()
     {
         EnsureConfigured();
         return Log.Logger;
     }
 
+    /// <summary>Flushes and closes the configured logger.</summary>
     public static void CloseAndFlush()
     {
         lock (SyncRoot)
         {
             Log.CloseAndFlush();
             isConfigured = false;
-            logDirectoryPath = null;
         }
     }
 
     private static void EnsureConfigured()
     {
-        if (isConfigured)
-        {
-            return;
-        }
-
         lock (SyncRoot)
         {
             if (isConfigured)
@@ -41,14 +36,15 @@ internal static class FileLoggerConfigurator
                 return;
             }
 
-            logDirectoryPath = ResolveLogDirectoryPath();
+            var logDirectoryPath = ResolveLogDirectoryPath();
             var logFilePathPattern = Path.Combine(logDirectoryPath, LogConstants.LogFileName);
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.Debug()
                 .WriteTo.File(
                     logFilePathPattern,
-                    restrictedToMinimumLevel: LogEventLevel.Information,
                     outputTemplate: LogConstants.OutputTemplate,
                     formatProvider: CultureInfo.InvariantCulture,
                     rollingInterval: RollingInterval.Day,
@@ -61,20 +57,28 @@ internal static class FileLoggerConfigurator
 
     private static string ResolveLogDirectoryPath()
     {
-        var applicationLogDirectory = Path.Combine(AppContext.BaseDirectory, LogConstants.LogDirectoryName);
+        var applicationLogDirectory = Path.Combine(FindApplicationRoot(), LogConstants.LogDirectoryName);
 
         if (CanWriteToDirectory(applicationLogDirectory))
         {
             return applicationLogDirectory;
         }
 
-        var localApplicationDataLogDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            LogConstants.ApplicationFolderName,
-            LogConstants.LogDirectoryName);
+        Directory.CreateDirectory(LogConstants.LocalAppDataLogDirectory);
+        return LogConstants.LocalAppDataLogDirectory;
+    }
 
-        Directory.CreateDirectory(localApplicationDataLogDirectory);
-        return localApplicationDataLogDirectory;
+    private static string FindApplicationRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, LogConstants.SolutionFileName)))
+            {
+                return directory.FullName;
+            }
+        }
+
+        return AppContext.BaseDirectory;
     }
 
     private static bool CanWriteToDirectory(string directoryPath)
