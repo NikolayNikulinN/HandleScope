@@ -48,20 +48,16 @@
         <File Source="$(var.HandleScope.TargetDir)HandleScope.runtimeconfig.json" KeyPath="yes" />
       </Component>
 
-      <Component Id="HandleScopeApplicationComponent">
-        <File Source="$(var.HandleScope.TargetDir)HandleScope.Application.dll" KeyPath="yes" />
+      <Component Id="HandleScopeServicesComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.Services.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="HandleScopeDomainComponent">
-        <File Source="$(var.HandleScope.TargetDir)HandleScope.Domain.dll" KeyPath="yes" />
+      <Component Id="HandleScopeLoggerComponent">
+        <File Source="$(var.HandleScope.TargetDir)HandleScope.Logger.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="HandleScopePresentationComponent">
         <File Source="$(var.HandleScope.TargetDir)HandleScope.Presentation.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="HandleScopeInfrastructureComponent">
-        <File Source="$(var.HandleScope.TargetDir)HandleScope.Infrastructure.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="CommunityToolkitMvvmComponent">

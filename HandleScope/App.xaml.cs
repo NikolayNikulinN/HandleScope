@@ -1,8 +1,8 @@
 using System.Windows;
-using HandleScope.Application.Services;
-using HandleScope.Domain;
-using HandleScope.Infrastructure.Native;
-using HandleScope.Infrastructure.Process;
+using HandleScope.Services.Abstract;
+using HandleScope.Logger.Constants;
+using HandleScope.Services.Native;
+using HandleScope.Services.Process;
 using HandleScope.Presentation.Abstract;
 using HandleScope.Presentation.Constants;
 using HandleScope.Presentation.Wrappers;
@@ -14,7 +14,7 @@ using Serilog;
 namespace HandleScope;
 
 /// <summary>Composes the application and manages its lifetime.</summary>
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private ServiceProvider? serviceProvider;
 
@@ -25,15 +25,19 @@ public partial class App : Application
             .MinimumLevel.Debug()
             .Enrich.FromLogContext()
             .WriteTo.Debug()
-            .WriteTo.File(AppStrings.LogFilePath,
+            .WriteTo.File(LogConstants.LogFilePath,
                           rollingInterval: RollingInterval.Day,
                           retainedFileCountLimit: 14)
             .CreateLogger();
-        Log.Information(AppStrings.ApplicationStartingLogMessage);
+        Log.Information(LogConstants.ApplicationStartingLogMessage);
 
         var services = new ServiceCollection();
         ConfigureServices(services);
-        serviceProvider = services.BuildServiceProvider();
+        serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        });
         Resources[nameof(ResourceWrapper)] = serviceProvider.GetRequiredService<IResourceWrapper>();
         MainWindow = serviceProvider.GetRequiredService<MainWindow>();
         MainWindow.Show();
@@ -41,7 +45,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        Log.Information(AppStrings.ApplicationShuttingDownLogMessage);
+        Log.Information(LogConstants.ApplicationShuttingDownLogMessage);
         serviceProvider?.Dispose();
         Log.CloseAndFlush();
         base.OnExit(e);

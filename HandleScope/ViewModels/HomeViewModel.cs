@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HandleScope.Application.Services;
+using HandleScope.Services.Abstract;
+using HandleScope.Logger.Constants;
 using HandleScope.Presentation.Abstract;
-using HandleScope.Domain;
-using HandleScope.Domain.Enums;
-using HandleScope.Domain.Models;
+using HandleScope.Services.Enums;
+using HandleScope.Services.Models;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -202,7 +202,7 @@ public sealed partial class HomeViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, AppStrings.EndProcessFailedLogTemplate, selected.ProcessId);
+            _logger.Error(ex, LogConstants.EndProcessFailedLogTemplate, selected.ProcessId);
             ErrorMessage = _resourceWrapper.Get(UiTextKey.EndProcessFailedUserMessage);
             StatusMessage = ErrorMessage;
         }
@@ -235,7 +235,7 @@ public sealed partial class HomeViewModel : ObservableObject
             }
 
             _logger.Information(
-                AppStrings.StartingHandleSearchLogTemplate,
+                LogConstants.StartingHandleSearchLogTemplate,
                 request.TargetPath,
                 request.SearchMode,
                 request.IncludeChildren);
@@ -264,7 +264,7 @@ public sealed partial class HomeViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, AppStrings.SearchFailedLogTemplate, request.TargetPath);
+            _logger.Error(ex, LogConstants.SearchFailedLogTemplate, request.TargetPath);
             ErrorMessage = _resourceWrapper.Get(UiTextKey.SearchFailedUserMessage);
             StatusMessage = ErrorMessage;
         }

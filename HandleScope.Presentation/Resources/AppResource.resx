@@ -270,7 +270,4 @@
   <data name="CloseBlockedToolTip" xml:space="preserve">
     <value>Wait for the current operation to finish before closing.</value>
   </data>
-  <data name="UnhandledErrorMessage" xml:space="preserve">
-    <value>An unexpected error occurred. Check the log file for details.</value>
-  </data>
 </root>

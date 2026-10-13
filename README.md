@@ -102,9 +102,9 @@ The installer:
 
 ```text
 HandleScope/                 WPF application and user interface
-HandleScope.Application/     Application service contracts
-HandleScope.Domain/          Domain models and shared contracts
-HandleScope.Infrastructure/  Restart Manager and process management services
+HandleScope.Services/        Service contracts, models, and Windows process services
+HandleScope.Presentation/    Shared WPF resources and controls
+HandleScope.Logger/          Logging configuration and constants
 HandleScope.Installer/       WiX MSI installer project
 ```
 

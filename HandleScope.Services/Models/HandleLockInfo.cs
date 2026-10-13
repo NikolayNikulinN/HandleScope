@@ -1,5 +1,6 @@
-namespace HandleScope.Domain.Models;
+namespace HandleScope.Services.Models;
 
+/// <summary>Describes a process holding a handle to a path.</summary>
 public sealed record HandleLockInfo(
     int ProcessId,
     string ProcessName,

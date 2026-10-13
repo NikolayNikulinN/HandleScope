@@ -1,4 +1,4 @@
-using HandleScope.Application.Services;
+using HandleScope.Services.Abstract;
 
 namespace HandleScope.Presentation.Abstract;
 

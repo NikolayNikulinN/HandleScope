@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Resources;
-using HandleScope.Application.Services;
+using HandleScope.Services.Abstract;
 using HandleScope.Presentation.Abstract;
 
 namespace HandleScope.Presentation.Wrappers;
@@ -37,5 +37,4 @@ public sealed class ResourceWrapper : IResourceWrapper
     public string RestoreToolTip => Get(UiTextKey.RestoreToolTip);
     public string CloseToolTip => Get(UiTextKey.CloseToolTip);
     public string CloseBlockedToolTip => Get(UiTextKey.CloseBlockedToolTip);
-    public string UnhandledErrorMessage => Get(UiTextKey.UnhandledErrorMessage);
 }

@@ -1,4 +1,4 @@
-namespace HandleScope.Application.Services;
+namespace HandleScope.Services.Abstract;
 
 /// <summary>Identifies text displayed by the application.</summary>
 public enum UiTextKey
@@ -53,8 +53,7 @@ public enum UiTextKey
     MaximizeToolTip,
     RestoreToolTip,
     CloseToolTip,
-    CloseBlockedToolTip,
-    UnhandledErrorMessage
+    CloseBlockedToolTip
 }
 
 /// <summary>Provides localized text without coupling services to WPF resources.</summary>

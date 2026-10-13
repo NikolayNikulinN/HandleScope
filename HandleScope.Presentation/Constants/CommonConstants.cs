@@ -7,10 +7,4 @@ namespace HandleScope.Presentation.Constants;
 /// </summary>
 public sealed class CommonConstants
 {
-    public const int RetainedLogFileCount = 14;
-
-
-   
 }
-
-public sealed record RegistryHiveOptionData(string DisplayName, RegistryHive? Hive, bool IsAllRegistry);

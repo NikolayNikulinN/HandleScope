@@ -47,9 +47,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HandleScope.Application\HandleScope.Application.csproj" />
-    <ProjectReference Include="..\HandleScope.Domain\HandleScope.Domain.csproj" />
-    <ProjectReference Include="..\HandleScope.Infrastructure\HandleScope.Infrastructure.csproj" />
+    <ProjectReference Include="..\HandleScope.Services\HandleScope.Services.csproj" />
+    <ProjectReference Include="..\HandleScope.Logger\HandleScope.Logger.csproj" />
     <ProjectReference Include="..\HandleScope.Presentation\HandleScope.Presentation.csproj" />
   </ItemGroup>
 

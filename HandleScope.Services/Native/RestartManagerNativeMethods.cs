@@ -1,22 +1,19 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using HandleScope.Domain;
+using HandleScope.Services.Constants;
 
-namespace HandleScope.Infrastructure.Native;
+namespace HandleScope.Services.Native;
 
 internal static class RestartManagerNativeMethods
 {
-    internal const int ErrorSuccess = 0;
-    internal const int ErrorMoreData = 234;
-
-    [DllImport(AppStrings.RestartManagerDllName, CharSet = CharSet.Unicode)]
+    [DllImport(ServiceConstants.RestartManagerDllName, CharSet = CharSet.Unicode)]
     internal static extern int RmStartSession(
         out uint sessionHandle,
         int sessionFlags,
         StringBuilder sessionKey);
 
-    [DllImport(AppStrings.RestartManagerDllName, CharSet = CharSet.Unicode)]
+    [DllImport(ServiceConstants.RestartManagerDllName, CharSet = CharSet.Unicode)]
     internal static extern int RmRegisterResources(
         uint sessionHandle,
         uint fileCount,
@@ -26,7 +23,7 @@ internal static class RestartManagerNativeMethods
         uint serviceCount,
         string[]? serviceNames);
 
-    [DllImport(AppStrings.RestartManagerDllName)]
+    [DllImport(ServiceConstants.RestartManagerDllName)]
     internal static extern int RmGetList(
         uint sessionHandle,
         out uint processInfoNeeded,
@@ -34,7 +31,7 @@ internal static class RestartManagerNativeMethods
         [In, Out] RmProcessInfo[]? affectedApplications,
         ref uint rebootReasons);
 
-    [DllImport(AppStrings.RestartManagerDllName)]
+    [DllImport(ServiceConstants.RestartManagerDllName)]
     internal static extern int RmEndSession(uint sessionHandle);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -49,10 +46,10 @@ internal static class RestartManagerNativeMethods
     {
         internal RmUniqueProcess Process;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ServiceConstants.ApplicationNameCapacity)]
         internal string ApplicationName;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ServiceConstants.ServiceNameCapacity)]
         internal string ServiceShortName;
 
         internal RmApplicationType ApplicationType;

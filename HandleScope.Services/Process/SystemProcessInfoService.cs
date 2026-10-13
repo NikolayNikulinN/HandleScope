@@ -1,21 +1,24 @@
-using HandleScope.Application.Services;
-using HandleScope.Domain;
-using HandleScope.Domain.Models;
+using HandleScope.Logger.Constants;
+using HandleScope.Services.Abstract;
+using HandleScope.Services.Models;
 using Serilog;
 
-namespace HandleScope.Infrastructure.Process;
+namespace HandleScope.Services.Process;
 
+/// <summary>Reads details about running Windows processes.</summary>
 public sealed class SystemProcessInfoService : IProcessInfoService
 {
-    private readonly ILogger _logger;
-    private readonly IUiText _uiText;
+    private readonly ILogger logger;
+    private readonly IUiText uiText;
 
+    /// <summary>Initializes the process information service.</summary>
     public SystemProcessInfoService(ILogger logger, IUiText uiText)
     {
-        _logger = logger.ForContext<SystemProcessInfoService>();
-        _uiText = uiText;
+        this.logger = logger.ForContext<SystemProcessInfoService>();
+        this.uiText = uiText;
     }
 
+    /// <inheritdoc />
     public ProcessDetails GetProcessDetails(int processId)
     {
         try
@@ -30,8 +33,8 @@ public sealed class SystemProcessInfoService : IProcessInfoService
         }
         catch (Exception ex)
         {
-            _logger.Warning(ex, AppStrings.ProcessDetailsResolveFailedLogTemplate, processId);
-            return new ProcessDetails(processId, string.Format(_uiText.Get(UiTextKey.ProcessDetailsFallbackNameFormat), processId), null, null);
+            logger.Warning(ex, LogConstants.ProcessDetailsResolveFailedLogTemplate, processId);
+            return new ProcessDetails(processId, string.Format(uiText.Get(UiTextKey.ProcessDetailsFallbackNameFormat), processId), null, null);
         }
     }
 
@@ -43,7 +46,7 @@ public sealed class SystemProcessInfoService : IProcessInfoService
         }
         catch (Exception ex)
         {
-            _logger.Debug(ex, AppStrings.ExecutablePathResolveFailedLogTemplate, process.Id);
+            logger.Debug(ex, LogConstants.ExecutablePathResolveFailedLogTemplate, process.Id);
             return null;
         }
     }
