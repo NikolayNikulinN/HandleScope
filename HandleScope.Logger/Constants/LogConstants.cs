@@ -30,6 +30,8 @@ public static class LogConstants
 
     public const string ExecutablePathResolveFailedLogTemplate = "Failed to resolve executable path for PID {ProcessId}";
 
+    public const string ProcessUserResolveFailedLogTemplate = "Failed to resolve user for PID {ProcessId}";
+
     public const int RetainedFileCountLimit = 14;
 
     public const string ApplicationFolderName = "HandleScope";

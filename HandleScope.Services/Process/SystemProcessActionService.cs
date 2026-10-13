@@ -3,6 +3,7 @@ using HandleScope.Services.Constants;
 using HandleScope.Logger.Constants;
 using HandleScope.Services.Results;
 using Serilog;
+using System.ComponentModel;
 
 namespace HandleScope.Services.Process;
 
@@ -69,6 +70,16 @@ public sealed class SystemProcessActionService : IProcessActionService
         catch (OperationCanceledException)
         {
             throw;
+        }
+        catch (Win32Exception ex) when (ex.NativeErrorCode == ServiceConstants.ErrorAccessDenied)
+        {
+            logger.Warning(ex, LogConstants.ProcessTerminationFailedLogTemplate, processId);
+            return new ProcessActionResult(false, string.Format(uiText.Get(UiTextKey.ProcessTerminationFailedFormat), processId, ex.Message), true);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            logger.Warning(ex, LogConstants.ProcessTerminationFailedLogTemplate, processId);
+            return new ProcessActionResult(false, string.Format(uiText.Get(UiTextKey.ProcessTerminationFailedFormat), processId, ex.Message), true);
         }
         catch (Exception ex)
         {

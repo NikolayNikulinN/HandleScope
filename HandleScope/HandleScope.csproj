@@ -56,7 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Docs\Images\" />
+    <Resource Include="Docs\Images\app.png" />
   </ItemGroup>
 
 </Project>

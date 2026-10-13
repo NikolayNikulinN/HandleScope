@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:viewModels="clr-namespace:HandleScope.ViewModels"
              d:DataContext="{d:DesignInstance Type=viewModels:HomeViewModel}"
              mc:Ignorable="d">
@@ -39,15 +40,22 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBox Grid.Column="0"
+                <TextBox x:Name="TargetPathInput"
+                         Grid.Column="0"
                          Margin="0,0,12,0"
+                         AllowDrop="True"
+                         materialDesign:HintAssist.Hint="{Binding TargetPathHint, Source={StaticResource ResourceWrapper}}"
+                         materialDesign:HintAssist.IsFloating="False"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:TextFieldAssist.TextBoxViewMargin="0,0,12,0"
+                         PreviewDragOver="OnTargetPathPreviewDragOver"
+                         PreviewDrop="OnTargetPathPreviewDrop"
                          Text="{Binding TargetPath, UpdateSourceTrigger=PropertyChanged}" />
 
                 <Button Grid.Column="1"
@@ -57,8 +65,9 @@
 
                 <Button Grid.Column="2"
                         Margin="0,0,8,0"
-                        Command="{Binding SearchCommand}"
-                        Content="{Binding SearchButton, Source={StaticResource ResourceWrapper}}" />
+                        Style="{StaticResource SearchOrStopButtonStyle}"
+                        Command="{Binding SearchOrStopCommand}"
+                        Content="{Binding SearchOrStopButtonText}" />
 
                 <Button Grid.Column="3"
                         Margin="0,0,8,0"
@@ -67,15 +76,12 @@
 
                 <Button Grid.Column="4"
                         Margin="0,0,8,0"
+                        Style="{StaticResource DangerButtonStyle}"
                         Command="{Binding EndSelectedProcessCommand}"
                         Content="{Binding EndProcessButton, Source={StaticResource ResourceWrapper}}" />
 
-                <Button Grid.Column="5"
-                        Command="{Binding CancelSearchCommand}"
-                        Content="{Binding CancelButton, Source={StaticResource ResourceWrapper}}" />
-
                 <StackPanel Grid.Row="1"
-                            Grid.ColumnSpan="6"
+                            Grid.ColumnSpan="5"
                             Margin="0,14,0,0"
                             Orientation="Horizontal">
                     <TextBlock Margin="0,0,8,0"
@@ -101,15 +107,35 @@
                     BorderThickness="1"
                     CornerRadius="8">
                 <DataGrid ItemsSource="{Binding Results}"
-                          SelectedItem="{Binding SelectedResult}">
+                          CanUserResizeColumns="True"
+                          CellStyle="{StaticResource ResultDataGridCellStyle}"
+                          ColumnHeaderStyle="{StaticResource ResultDataGridColumnHeaderStyle}"
+                          IsReadOnly="True"
+                          SelectionUnit="Cell"
+                          SelectedCellsChanged="OnResultsSelectedCellsChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding ProcessName}" Header="{Binding GridProcess, Source={StaticResource ResourceWrapper}}" Width="2*" />
-                    <DataGridTextColumn Binding="{Binding ProcessId}" Header="{Binding GridProcessId, Source={StaticResource ResourceWrapper}}" Width="90" />
-                    <DataGridTextColumn Binding="{Binding UserName}" Header="{Binding GridUser, Source={StaticResource ResourceWrapper}}" Width="160" />
-                    <DataGridTextColumn Binding="{Binding ProcessPath}" Header="{Binding GridExecutablePath, Source={StaticResource ResourceWrapper}}" Width="3*" />
-                    <DataGridTextColumn Binding="{Binding LockedPath}" Header="{Binding GridLockedPath, Source={StaticResource ResourceWrapper}}" Width="3*" />
-                    <DataGridTextColumn Binding="{Binding HandleType}" Header="{Binding GridHandleType, Source={StaticResource ResourceWrapper}}" Width="120" />
-                    <DataGridTextColumn Binding="{Binding Access}" Header="{Binding GridAccess, Source={StaticResource ResourceWrapper}}" Width="120" />
+                    <DataGridTemplateColumn Width="52"
+                                            MinWidth="52"
+                                            MaxWidth="52"
+                                            CanUserResize="False"
+                                            HeaderStyle="{StaticResource ResultSelectionColumnHeaderStyle}"
+                                            CellStyle="{StaticResource ResultSelectionCellStyle}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Style="{StaticResource ResultSelectionCheckBoxStyle}"
+                                          IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding LockInfo.ProcessName}" Header="{Binding GridProcess, Source={StaticResource ResourceWrapper}}" Width="2*" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.ProcessId}" Header="{Binding GridProcessId, Source={StaticResource ResourceWrapper}}" Width="90" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.UserName}" Header="{Binding GridUser, Source={StaticResource ResourceWrapper}}" Width="160" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.ProcessPath}" Header="{Binding GridExecutablePath, Source={StaticResource ResourceWrapper}}" Width="3*" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.LockedPath}" Header="{Binding GridLockedPath, Source={StaticResource ResourceWrapper}}" Width="3*" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.HandleType}" Header="{Binding GridHandleType, Source={StaticResource ResourceWrapper}}" Width="120" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
+                    <DataGridTextColumn Binding="{Binding LockInfo.Access}" Header="{Binding GridAccess, Source={StaticResource ResourceWrapper}}" Width="120" ElementStyle="{StaticResource ResultDataGridTextStyle}" />
                 </DataGrid.Columns>
             </DataGrid>
             </Border>

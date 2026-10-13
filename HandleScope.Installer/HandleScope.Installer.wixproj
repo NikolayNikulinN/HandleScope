@@ -11,7 +11,7 @@
     <OutDir>$(MSBuildProjectDirectory)\$(OutputPath)</OutDir>
     <InstallRootDirectory Condition="'$(InstallerPlatform)' == 'x86'">ProgramFilesFolder</InstallRootDirectory>
     <InstallRootDirectory Condition="'$(InstallRootDirectory)' == ''">ProgramFiles64Folder</InstallRootDirectory>
-    <InstallerProductVersion>1.0.0</InstallerProductVersion>
+    <InstallerProductVersion>1.0.1</InstallerProductVersion>
     <Manufacturer>HandleScope</Manufacturer>
     <DefineConstants>
       InstallerProductVersion=$(InstallerProductVersion);

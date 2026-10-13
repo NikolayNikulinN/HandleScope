@@ -52,10 +52,13 @@
                            Style="{StaticResource TitleBarImageButtonStyle}"
                            ToolTip="{Binding CloseToolTip}"
                            Click="CloseButtonClick">
-                    <Image Width="18"
-                           Height="18"
-                           Source="{Binding CloseIconPath}"
-                           Stretch="Uniform" />
+                    <Rectangle Width="18"
+                               Height="18"
+                               Fill="{StaticResource Brush.Danger}">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="{Binding CloseIconPath}" Stretch="Uniform" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
                 </ui:Button>
             </Grid>
 
@@ -91,18 +94,30 @@
                     <ui:Button Width="96"
                                Height="34"
                                Margin="0,0,8,0"
+                               Padding="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
                                Appearance="Secondary"
+                               Background="{StaticResource Brush.Button}"
+                               BorderBrush="{StaticResource Brush.ButtonBorder}"
+                               Foreground="{StaticResource Brush.TextPrimary}"
                                Cursor="Hand"
                                Content="{Binding CancelButtonText}"
                                Visibility="{Binding CancelButtonVisibility}"
+                               IsDefault="True"
                                IsCancel="True"
                                Click="CancelButtonClick" />
                     <ui:Button Width="96"
                                Height="34"
+                               Padding="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
                                Appearance="Primary"
+                               Background="{StaticResource Brush.Accent}"
+                               BorderBrush="{StaticResource Brush.Accent}"
+                               Foreground="{StaticResource Brush.OnAccent}"
                                Cursor="Hand"
                                Content="{Binding ConfirmButtonText}"
-                               IsDefault="True"
                                Click="ConfirmButtonClick" />
                 </StackPanel>
             </Border>

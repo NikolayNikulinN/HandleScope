@@ -47,6 +47,7 @@ public static class FileLoggerConfigurator
                     logFilePathPattern,
                     outputTemplate: LogConstants.OutputTemplate,
                     formatProvider: CultureInfo.InvariantCulture,
+                    shared: true,
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: LogConstants.RetainedFileCountLimit)
                 .CreateLogger();

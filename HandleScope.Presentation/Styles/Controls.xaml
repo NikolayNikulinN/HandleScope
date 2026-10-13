@@ -12,22 +12,113 @@
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
         <Setter Property="MinHeight" Value="36" />
         <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Background" Value="{StaticResource Brush.SurfaceMuted}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
         <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Brush.Accent}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+    <ControlTemplate x:Key="ActionButtonTemplate" TargetType="{x:Type Button}">
+        <Border x:Name="Chrome"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="7"
+                SnapsToDevicePixels="True">
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              RecognizesAccessKey="True" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource Brush.AccentHover}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Chrome" Property="Opacity" Value="0.48" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="ActionButtonBaseStyle" TargetType="{x:Type Button}">
         <Setter Property="MinHeight" Value="36" />
         <Setter Property="MinWidth" Value="92" />
         <Setter Property="Padding" Value="14,7" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Background" Value="{StaticResource Brush.Button}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.ButtonBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template" Value="{StaticResource ActionButtonTemplate}" />
     </Style>
 
-    <Style x:Key="PrimaryButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
-        <Setter Property="MinHeight" Value="36" />
-        <Setter Property="MinWidth" Value="92" />
-        <Setter Property="Padding" Value="14,7" />
-        <Setter Property="Cursor" Value="Hand" />
+    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ActionButtonBaseStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.ButtonHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.ButtonPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PrimaryButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource ActionButtonBaseStyle}">
+        <Setter Property="Background" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.OnAccent}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.AccentHover}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.AccentHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.AccentPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SearchOrStopButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.StopButton}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.StopButtonBorder}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSearching}" Value="True" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource Brush.StopButtonHover}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSearching}" Value="True" />
+                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource Brush.StopButtonPressed}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DangerButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource ActionButtonBaseStyle}">
+        <Setter Property="Background" Value="{StaticResource Brush.DangerSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Danger}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.DangerHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush.DangerSurface}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="HandCursorComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource MaterialDesignComboBoxItemStyle}">
@@ -36,12 +127,16 @@
 
     <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignComboBox}">
         <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Background" Value="{StaticResource Brush.SurfaceMuted}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource HandCursorComboBoxItemStyle}" />
     </Style>
 
-    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}" />
+    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+    </Style>
 
     <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}">
         <Setter Property="AutoGenerateColumns" Value="False" />
@@ -50,7 +145,112 @@
         <Setter Property="GridLinesVisibility" Value="Horizontal" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="Background" Value="{StaticResource Brush.Surface}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Brush.Border}" />
         <Setter Property="RowBackground" Value="{StaticResource Brush.Surface}" />
         <Setter Property="AlternatingRowBackground" Value="{StaticResource Brush.SurfaceMuted}" />
+    </Style>
+
+    <Style x:Key="ResultDataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Background" Value="{StaticResource Brush.ResultHeader}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.ResultHeaderDivider}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                    <Grid Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="True"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        <Path x:Name="SortDirectionIndicator"
+                              Width="10"
+                              Height="6"
+                              Margin="0,0,8,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              Data="M0,6 L5,0 L10,6 Z"
+                              Fill="{TemplateBinding Foreground}"
+                              IsHitTestVisible="False"
+                              Opacity="0.65"
+                              Visibility="Collapsed" />
+                        <Border x:Name="ColumnDivider"
+                                Width="2"
+                                Margin="0,5,0,5"
+                                HorizontalAlignment="Right"
+                                Background="{TemplateBinding BorderBrush}"
+                                IsHitTestVisible="False" />
+                        <Thumb x:Name="PART_LeftHeaderGripper"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource MaterialDesignGridColumnHeaderGripper}" />
+                        <Thumb x:Name="PART_RightHeaderGripper"
+                               HorizontalAlignment="Right"
+                               Style="{StaticResource MaterialDesignGridColumnHeaderGripper}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter TargetName="SortDirectionIndicator" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter TargetName="SortDirectionIndicator" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SortDirectionIndicator" Property="Data" Value="M0,0 L5,6 L10,0 Z" />
+                        </Trigger>
+                        <Trigger Property="Tag" Value="False">
+                            <Setter TargetName="ColumnDivider" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_RightHeaderGripper" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ResultSelectionColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResultDataGridColumnHeaderStyle}">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Tag" Value="False" />
+    </Style>
+
+    <Style x:Key="ResultDataGridCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="ResultDataGridTextStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignDataGridTextColumnStyle}">
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="ResultSelectionCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource ResultDataGridCellStyle}">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="ResultSelectionCheckBoxStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="LayoutTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

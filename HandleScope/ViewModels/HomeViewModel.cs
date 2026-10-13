@@ -7,29 +7,32 @@ using HandleScope.Services.Enums;
 using HandleScope.Services.Models;
 using Serilog;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
-using System.Windows;
+using HandleScope.Models;
 
 namespace HandleScope.ViewModels;
 
 /// <summary>Provides search commands and results for the home page.</summary>
 public sealed partial class HomeViewModel : ObservableObject
 {
-    private readonly IHandleSearchService _handleSearchService;
-    private readonly IProcessActionService _processActionService;
-    private readonly ILogger _logger;
-    private readonly IResourceWrapper _resourceWrapper;
-    private CancellationTokenSource? _searchCancellation;
-    private HandleSearchRequest? _lastSearchRequest;
+    private readonly IHandleSearchService handleSearchService;
+    private readonly IProcessActionService processActionService;
+    private readonly ILogger logger;
+    private readonly IResourceWrapper resourceWrapper;
+    private readonly IProcessTerminationConfirmationService processTerminationConfirmationService;
+    private CancellationTokenSource? searchCancellation;
+    private HandleSearchRequest? lastSearchRequest;
 
     public IReadOnlyList<HandleSearchModeOption> SearchModes { get; }
 
-    public ObservableCollection<HandleLockInfo> Results { get; } = [];
+    public ObservableCollection<HandleLockResultModel> Results { get; } = [];
 
     public ObservableCollection<string> Warnings { get; } = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SearchOrStopCommand))]
     private string _targetPath = string.Empty;
 
     [ObservableProperty]
@@ -41,15 +44,17 @@ public sealed partial class HomeViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SearchOrStopCommand))]
     [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
-    [NotifyCanExecuteChangedFor(nameof(CancelSearchCommand))]
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
     [NotifyPropertyChangedFor(nameof(IsIdle))]
+    [NotifyPropertyChangedFor(nameof(SearchOrStopButtonText))]
     private bool _isSearching;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SearchOrStopCommand))]
     [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
@@ -58,7 +63,7 @@ public sealed partial class HomeViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
-    private HandleLockInfo? _selectedResult;
+    private HandleLockResultModel? selectedResult;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -67,9 +72,11 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
 
-    public IResourceWrapper ResourceWrapper => _resourceWrapper;
+    public IResourceWrapper ResourceWrapper => resourceWrapper;
 
     public bool IsIdle => !IsSearching && !IsEndingProcess;
+
+    public string SearchOrStopButtonText => resourceWrapper.Get(IsSearching ? UiTextKey.StopButton : UiTextKey.SearchButton);
 
     public bool HasResults => Results.Count > 0;
 
@@ -82,17 +89,46 @@ public sealed partial class HomeViewModel : ObservableObject
     public HomeViewModel(IHandleSearchService handleSearchService,
                          IProcessActionService processActionService,
                          ILogger logger,
-                         IResourceWrapper resourceWrapper)
+                         IResourceWrapper resourceWrapper,
+                         IProcessTerminationConfirmationService processTerminationConfirmationService)
     {
-        _handleSearchService = handleSearchService;
-        _processActionService = processActionService;
-        _logger = logger.ForContext<HomeViewModel>();
-        _resourceWrapper = resourceWrapper;
+        handleSearchService = handleSearchService;
+        processActionService = processActionService;
+        logger = logger.ForContext<HomeViewModel>();
+        resourceWrapper = resourceWrapper;
+        this.processTerminationConfirmationService = processTerminationConfirmationService;
         var fileMode = new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.FileSearchModeDisplayName), HandleSearchMode.File);
         SearchModes = [fileMode,
                        new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.DirectorySearchModeDisplayName), HandleSearchMode.Directory)];
         _selectedSearchMode = fileMode;
         _statusMessage = resourceWrapper.Get(UiTextKey.InitialStatusMessage);
+    }
+
+    /// <summary>Uses a dropped file or folder as the next search target.</summary>
+    public bool TrySetDroppedPath(string path)
+    {
+        if (!IsIdle)
+        {
+            return false;
+        }
+
+        HandleSearchMode mode;
+        if (Directory.Exists(path))
+        {
+            mode = HandleSearchMode.Directory;
+        }
+        else if (File.Exists(path))
+        {
+            mode = HandleSearchMode.File;
+        }
+        else
+        {
+            return false;
+        }
+
+        SelectedSearchMode = SearchModes.Single(option => option.Mode == mode);
+        TargetPath = path;
+        return true;
     }
 
     [RelayCommand(CanExecute = nameof(CanSearch))]
@@ -106,15 +142,27 @@ public sealed partial class HomeViewModel : ObservableObject
         await RunSearchAsync(request, rememberRequest: true);
     }
 
+    [RelayCommand(CanExecute = nameof(CanSearchOrStop))]
+    private void SearchOrStop()
+    {
+        if (IsSearching)
+        {
+            searchCancellation?.Cancel();
+            return;
+        }
+
+        SearchCommand.Execute(null);
+    }
+
     [RelayCommand(CanExecute = nameof(CanRefresh))]
     private async Task RefreshAsync()
     {
-        if (_lastSearchRequest is null)
+        if (lastSearchRequest is null)
         {
             return;
         }
 
-        await RunSearchAsync(_lastSearchRequest, rememberRequest: false);
+        await RunSearchAsync(lastSearchRequest, rememberRequest: false);
     }
 
     [RelayCommand(CanExecute = nameof(CanBrowse))]
@@ -124,7 +172,7 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog
             {
-                Description = _resourceWrapper.Get(UiTextKey.SelectTargetFolderDescription),
+                Description = resourceWrapper.Get(UiTextKey.SelectTargetFolderDescription),
                 UseDescriptionForTitle = true,
                 SelectedPath = Directory.Exists(TargetPath) ? TargetPath : string.Empty
             };
@@ -141,19 +189,13 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             CheckFileExists = false,
             CheckPathExists = true,
-            Title = _resourceWrapper.Get(UiTextKey.SelectTargetFileTitle)
+            Title = resourceWrapper.Get(UiTextKey.SelectTargetFileTitle)
         };
 
         if (fileDialog.ShowDialog() == true)
         {
             TargetPath = fileDialog.FileName;
         }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanCancelSearch))]
-    private void CancelSearch()
-    {
-        _searchCancellation?.Cancel();
     }
 
     [RelayCommand(CanExecute = nameof(CanEndSelectedProcess))]
@@ -164,26 +206,20 @@ public sealed partial class HomeViewModel : ObservableObject
             return;
         }
 
-        var selected = SelectedResult;
-        var confirmation = System.Windows.MessageBox.Show(
-            string.Format(_resourceWrapper.Get(UiTextKey.ConfirmProcessTerminationFormat), selected.ProcessName, selected.ProcessId),
-            _resourceWrapper.Get(UiTextKey.ConfirmProcessTerminationTitle),
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning,
-            MessageBoxResult.No);
-
-        if (confirmation != MessageBoxResult.Yes)
-        {
-            return;
-        }
-
+        var selectedItem = SelectedResult;
+        var selected = selectedItem.LockInfo;
         try
         {
+            if (!processTerminationConfirmationService.Confirm(selected.ProcessName, selected.ProcessId))
+            {
+                return;
+            }
+
             IsEndingProcess = true;
             ErrorMessage = null;
-            StatusMessage = string.Format(_resourceWrapper.Get(UiTextKey.EndingProcessStatusFormat), selected.ProcessName);
+            StatusMessage = string.Format(resourceWrapper.Get(UiTextKey.EndingProcessStatusFormat), selected.ProcessName);
 
-            var result = await _processActionService.CloseProcessAsync(selected.ProcessId, CancellationToken.None);
+            var result = await processActionService.CloseProcessAsync(selected.ProcessId, CancellationToken.None);
             StatusMessage = result.Message;
 
             if (!result.Succeeded)
@@ -192,18 +228,20 @@ public sealed partial class HomeViewModel : ObservableObject
                 return;
             }
 
-            Results.Remove(selected);
+            selectedItem.PropertyChanged -= OnResultPropertyChanged;
+            Results.Remove(selectedItem);
+            SelectedResult = null;
             NotifyCollectionStateChanged();
 
-            if (_lastSearchRequest is not null)
+            if (lastSearchRequest is not null)
             {
-                await RunSearchAsync(_lastSearchRequest, rememberRequest: false);
+                await RunSearchAsync(lastSearchRequest, rememberRequest: false);
             }
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, LogConstants.EndProcessFailedLogTemplate, selected.ProcessId);
-            ErrorMessage = _resourceWrapper.Get(UiTextKey.EndProcessFailedUserMessage);
+            logger.Error(ex, LogConstants.EndProcessFailedLogTemplate, selected.ProcessId);
+            ErrorMessage = resourceWrapper.Get(UiTextKey.EndProcessFailedUserMessage);
             StatusMessage = ErrorMessage;
         }
         finally
@@ -214,10 +252,11 @@ public sealed partial class HomeViewModel : ObservableObject
 
     private async Task RunSearchAsync(HandleSearchRequest request, bool rememberRequest)
     {
-        _searchCancellation?.Cancel();
-        _searchCancellation = new CancellationTokenSource();
+        searchCancellation?.Cancel();
+        var searchCancellationTemp = new CancellationTokenSource();
+        searchCancellation = searchCancellationTemp;
 
-        Results.Clear();
+        ClearResults();
         Warnings.Clear();
         ErrorMessage = null;
         SelectedResult = null;
@@ -226,25 +265,28 @@ public sealed partial class HomeViewModel : ObservableObject
         try
         {
             IsSearching = true;
-            StatusMessage = _resourceWrapper.Get(UiTextKey.SearchInProgressStatusMessage);
+            StatusMessage = resourceWrapper.Get(UiTextKey.SearchInProgressStatusMessage);
 
             if (rememberRequest)
             {
-                _lastSearchRequest = request;
+                lastSearchRequest = request;
                 RefreshCommand.NotifyCanExecuteChanged();
             }
 
-            _logger.Information(
+            logger.Information(
                 LogConstants.StartingHandleSearchLogTemplate,
                 request.TargetPath,
                 request.SearchMode,
                 request.IncludeChildren);
 
-            var result = await _handleSearchService.SearchAsync(request, _searchCancellation.Token);
+            var result = await handleSearchService.SearchAsync(request, searchCancellation.Token);
+            searchCancellation.Token.ThrowIfCancellationRequested();
 
             foreach (var item in result.Items)
             {
-                Results.Add(item);
+                var resultItem = new HandleLockResultModel(item);
+                resultItem.PropertyChanged += OnResultPropertyChanged;
+                Results.Add(resultItem);
             }
 
             foreach (var warning in result.Warnings)
@@ -255,24 +297,24 @@ public sealed partial class HomeViewModel : ObservableObject
             NotifyCollectionStateChanged();
 
             StatusMessage = result.Items.Count == 0
-                ? _resourceWrapper.Get(UiTextKey.NoLockingProcessesFoundStatusMessage)
-                : string.Format(_resourceWrapper.Get(UiTextKey.LockingProcessEntriesFoundFormat), result.Items.Count);
+                ? resourceWrapper.Get(UiTextKey.NoLockingProcessesFoundStatusMessage)
+                : string.Format(resourceWrapper.Get(UiTextKey.LockingProcessEntriesFoundFormat), result.Items.Count);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = _resourceWrapper.Get(UiTextKey.SearchCancelledStatusMessage);
+            StatusMessage = resourceWrapper.Get(UiTextKey.SearchCancelledStatusMessage);
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, LogConstants.SearchFailedLogTemplate, request.TargetPath);
-            ErrorMessage = _resourceWrapper.Get(UiTextKey.SearchFailedUserMessage);
+            logger.Error(ex, LogConstants.SearchFailedLogTemplate, request.TargetPath);
+            ErrorMessage = resourceWrapper.Get(UiTextKey.SearchFailedUserMessage);
             StatusMessage = ErrorMessage;
         }
         finally
         {
             IsSearching = false;
-            _searchCancellation.Dispose();
-            _searchCancellation = null;
+            searchCancellation.Dispose();
+            searchCancellation = null;
             RefreshCommand.NotifyCanExecuteChanged();
         }
     }
@@ -282,19 +324,19 @@ public sealed partial class HomeViewModel : ObservableObject
         return !IsSearching && !IsEndingProcess && !string.IsNullOrWhiteSpace(TargetPath);
     }
 
+    private bool CanSearchOrStop()
+    {
+        return IsSearching || CanSearch();
+    }
+
     private bool CanRefresh()
     {
-        return !IsSearching && !IsEndingProcess && _lastSearchRequest is not null;
+        return !IsSearching && !IsEndingProcess && lastSearchRequest is not null;
     }
 
     private bool CanBrowse()
     {
         return !IsSearching && !IsEndingProcess;
-    }
-
-    private bool CanCancelSearch()
-    {
-        return IsSearching;
     }
 
     private bool CanEndSelectedProcess()
@@ -306,6 +348,38 @@ public sealed partial class HomeViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(HasResults));
         OnPropertyChanged(nameof(HasWarnings));
+    }
+
+    private void OnResultPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(HandleLockResultModel.IsChecked) || sender is not HandleLockResultModel item)
+        {
+            return;
+        }
+
+        if (item.IsChecked)
+        {
+            if (SelectedResult is { } previous && !ReferenceEquals(previous, item))
+            {
+                previous.IsChecked = false;
+            }
+
+            SelectedResult = item;
+        }
+        else if (ReferenceEquals(SelectedResult, item))
+        {
+            SelectedResult = null;
+        }
+    }
+
+    private void ClearResults()
+    {
+        foreach (var item in Results)
+        {
+            item.PropertyChanged -= OnResultPropertyChanged;
+        }
+
+        Results.Clear();
     }
 }
 

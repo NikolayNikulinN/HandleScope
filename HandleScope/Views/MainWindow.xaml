@@ -20,8 +20,8 @@
                  StateChanged="WindowStateChanged"
                  Closing="WindowClosing"
                  mc:Ignorable="d">
-    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
-            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+    <Border Background="{StaticResource Brush.AppBackground}"
+            BorderBrush="{StaticResource Brush.Border}"
             BorderThickness="1"
             CornerRadius="8">
         <Grid>
@@ -30,7 +30,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid Background="{DynamicResource LayerFillColorDefaultBrush}"
+            <Grid Background="{StaticResource Brush.SurfaceMuted}"
                   MouseLeftButtonDown="TitleBarMouseLeftButtonDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -48,14 +48,14 @@
                                VerticalAlignment="Center"
                                FontSize="13"
                                FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Foreground="{StaticResource Brush.TextPrimary}"
                                Text="{Binding ResourceWrapper.AppTitle}" />
                 </StackPanel>
 
                 <Border Grid.ColumnSpan="2"
                         Height="1"
                         VerticalAlignment="Bottom"
-                        Background="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                        Background="{StaticResource Brush.Border}" />
 
                 <StackPanel Grid.Column="1"
                             Margin="0,0,6,0"
@@ -64,19 +64,25 @@
                     <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
                                Click="MinimizeButtonClick"
                                ToolTip="{Binding ResourceWrapper.MinimizeToolTip}">
-                        <Image Width="22"
-                               Height="22"
-                               Source="{Binding AppConstants.Images.MinimizePath}"
-                               Stretch="Uniform" />
+                        <Rectangle Width="22"
+                                   Height="22"
+                                   Fill="{StaticResource Brush.TextPrimary}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="{Binding AppConstants.Images.MinimizePath}" Stretch="Uniform" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </ui:Button>
 
                     <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
                                Click="MaximizeRestoreButtonClick"
                                ToolTip="{Binding MaximizeRestoreToolTip}">
-                        <Image Width="22"
-                               Height="22"
-                               Source="{Binding MaximizeRestoreIconPath}"
-                               Stretch="Uniform" />
+                        <Rectangle Width="22"
+                                   Height="22"
+                                   Fill="{StaticResource Brush.TextPrimary}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="{Binding MaximizeRestoreIconPath}" Stretch="Uniform" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </ui:Button>
 
                     <ui:Button Style="{StaticResource TitleBarImageButtonStyle}"
@@ -84,10 +90,13 @@
                                IsEnabled="{Binding CanCloseApplication}"
                                ToolTip="{Binding CloseButtonToolTip}"
                                ToolTipService.ShowOnDisabled="True">
-                        <Image Width="22"
-                               Height="22"
-                               Source="{Binding AppConstants.Images.ClosePath}"
-                               Stretch="Uniform" />
+                        <Rectangle Width="22"
+                                   Height="22"
+                                   Fill="{StaticResource Brush.Danger}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="{Binding AppConstants.Images.ClosePath}" Stretch="Uniform" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </ui:Button>
                 </StackPanel>
             </Grid>

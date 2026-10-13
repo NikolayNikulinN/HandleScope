@@ -123,11 +123,17 @@
   <data name="AppSubtitle" xml:space="preserve">
     <value>Find processes locking files and folders.</value>
   </data>
+  <data name="TargetPathHint" xml:space="preserve">
+    <value>Enter a path or drop a file or folder here</value>
+  </data>
   <data name="BrowseButton" xml:space="preserve">
     <value>Browse</value>
   </data>
   <data name="SearchButton" xml:space="preserve">
     <value>Search</value>
+  </data>
+  <data name="StopButton" xml:space="preserve">
+    <value>Stop</value>
   </data>
   <data name="RefreshButton" xml:space="preserve">
     <value>Refresh</value>
@@ -191,6 +197,12 @@
   </data>
   <data name="EndProcessFailedUserMessage" xml:space="preserve">
     <value>Failed to end process. See the log file for details.</value>
+  </data>
+  <data name="ElevationCancelledMessage" xml:space="preserve">
+    <value>Administrator permission was cancelled. The process was not ended.</value>
+  </data>
+  <data name="ElevationStartFailedMessage" xml:space="preserve">
+    <value>Could not start the process termination helper.</value>
   </data>
   <data name="SearchInProgressStatusMessage" xml:space="preserve">
     <value>Searching for locking processes...</value>

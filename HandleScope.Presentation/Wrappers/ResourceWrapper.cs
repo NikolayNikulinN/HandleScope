@@ -18,11 +18,11 @@ public sealed class ResourceWrapper : IResourceWrapper
 
     public string AppTitle => Get(UiTextKey.AppTitle);
     public string AppSubtitle => Get(UiTextKey.AppSubtitle);
+    public string TargetPathHint => Get(UiTextKey.TargetPathHint);
     public string BrowseButton => Get(UiTextKey.BrowseButton);
     public string SearchButton => Get(UiTextKey.SearchButton);
     public string RefreshButton => Get(UiTextKey.RefreshButton);
     public string EndProcessButton => Get(UiTextKey.EndProcessButton);
-    public string CancelButton => Get(UiTextKey.CancelButton);
     public string ModeLabel => Get(UiTextKey.ModeLabel);
     public string IncludeChildPaths => Get(UiTextKey.IncludeChildPaths);
     public string GridProcess => Get(UiTextKey.GridProcess);
