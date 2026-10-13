@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37301.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope", "src\HandleScope\HandleScope.csproj", "{78EE7BAE-C7E0-4F7E-ABB9-8EDFD4699082}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope", "HandleScope\HandleScope.csproj", "{78EE7BAE-C7E0-4F7E-ABB9-8EDFD4699082}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "installer", "installer", "{1860D2E4-5C43-71D5-59A5-599A4DE1DF67}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "HandleScope.Installer", "HandleScope.Installer\HandleScope.Installer.wixproj", "{B417B9FD-51FF-4C17-8FE6-25A0A51F7213}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "HandleScope.Installer", "installer\HandleScope.Installer\HandleScope.Installer.wixproj", "{B417B9FD-51FF-4C17-8FE6-25A0A51F7213}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Domain", "HandleScope.Domain\HandleScope.Domain.csproj", "{47832F5D-4A8B-402E-9A62-C9E44A9F9C24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Domain", "src\HandleScope.Domain\HandleScope.Domain.csproj", "{47832F5D-4A8B-402E-9A62-C9E44A9F9C24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Application", "HandleScope.Application\HandleScope.Application.csproj", "{B22B0F28-AA2B-4D4C-BA75-F909E36A7AB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Application", "src\HandleScope.Application\HandleScope.Application.csproj", "{B22B0F28-AA2B-4D4C-BA75-F909E36A7AB6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Infrastructure", "src\HandleScope.Infrastructure\HandleScope.Infrastructure.csproj", "{8015A3B2-537C-4EAB-B336-BA7A77627EA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Infrastructure", "HandleScope.Infrastructure\HandleScope.Infrastructure.csproj", "{8015A3B2-537C-4EAB-B336-BA7A77627EA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,9 +86,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B417B9FD-51FF-4C17-8FE6-25A0A51F7213} = {1860D2E4-5C43-71D5-59A5-599A4DE1DF67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2067F1C8-8F9D-41D2-AB54-BAEC0EDB2136}

@@ -8,7 +8,7 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
     <MediaTemplate EmbedCab="yes" />
-    <Icon Id="HandleScopeInstallerIcon.ico" SourceFile="..\..\src\HandleScope\Images\HandleScope.ico" />
+    <Icon Id="HandleScopeInstallerIcon.ico" SourceFile="..\HandleScope\Images\HandleScope.ico" />
     <Property Id="ARPPRODUCTICON" Value="HandleScopeInstallerIcon.ico" />
 
     <Feature Id="MainFeature" Title="HandleScope" Level="1">

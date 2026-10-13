@@ -2,7 +2,7 @@
 
 Windows File Lock Detection Utility
 
-![HandleScope main window](src/HandleScope/Docs/Images/main-window.png)
+![HandleScope main window](HandleScope/Docs/Images/main-window.png)
 
 HandleScope is a Windows desktop utility that identifies processes locking files and folders, helping users quickly discover why resources cannot be deleted, moved, renamed, or modified.
 
@@ -68,7 +68,7 @@ dotnet build .\HandleScope.sln
 Run the application:
 
 ```powershell
-dotnet run --project .\src\HandleScope\HandleScope.csproj
+dotnet run --project .\HandleScope\HandleScope.csproj
 ```
 
 ## MSI Installer
@@ -76,19 +76,19 @@ dotnet run --project .\src\HandleScope\HandleScope.csproj
 The installer project is located in:
 
 ```text
-installer\HandleScope.Installer
+HandleScope.Installer
 ```
 
 Build the MSI installer:
 
 ```powershell
-dotnet build .\installer\HandleScope.Installer\HandleScope.Installer.wixproj -c Release
+dotnet build .\HandleScope.Installer\HandleScope.Installer.wixproj -c Release
 ```
 
 The generated MSI package is created in:
 
 ```text
-installer\HandleScope.Installer\bin\Release\HandleScopeSetup.msi
+HandleScope.Installer\bin\Release\HandleScopeSetup.msi
 ```
 
 The installer:
@@ -101,17 +101,11 @@ The installer:
 ## Project Structure
 
 ```text
-src/
-  HandleScope/                 WPF application and user interface
-  HandleScope.Application/     Application service contracts
-  HandleScope.Domain/          Domain models and shared contracts
-  HandleScope.Infrastructure/  Restart Manager and process management services
-
-installer/
-  HandleScope.Installer/       WiX MSI installer project
-
-docs/
-  images/                      Screenshots and documentation assets
+HandleScope/                 WPF application and user interface
+HandleScope.Application/     Application service contracts
+HandleScope.Domain/          Domain models and shared contracts
+HandleScope.Infrastructure/  Restart Manager and process management services
+HandleScope.Installer/       WiX MSI installer project
 ```
 
 ## Logging

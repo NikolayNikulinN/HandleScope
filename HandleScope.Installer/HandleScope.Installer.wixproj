@@ -12,6 +12,6 @@
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\HandleScope\HandleScope.csproj" />
+    <ProjectReference Include="..\HandleScope\HandleScope.csproj" />
   </ItemGroup>
 </Project>
