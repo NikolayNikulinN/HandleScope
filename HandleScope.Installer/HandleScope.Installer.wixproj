@@ -1,4 +1,4 @@
-<Project Sdk="WixToolset.Sdk/6.0.2" ToolsVersion="4.0">
+﻿<Project Sdk="WixToolset.Sdk/6.0.2" ToolsVersion="4.0">
   <PropertyGroup>
     <OutputType>Package</OutputType>
     <OutputName>HandleScopeSetup</OutputName>
@@ -11,7 +11,7 @@
     <OutDir>$(MSBuildProjectDirectory)\$(OutputPath)</OutDir>
     <InstallRootDirectory Condition="'$(InstallerPlatform)' == 'x86'">ProgramFilesFolder</InstallRootDirectory>
     <InstallRootDirectory Condition="'$(InstallRootDirectory)' == ''">ProgramFiles64Folder</InstallRootDirectory>
-    <InstallerProductVersion>1.0.1</InstallerProductVersion>
+    <InstallerProductVersion>1.0.0</InstallerProductVersion>
     <Manufacturer>HandleScope</Manufacturer>
     <DefineConstants>
       InstallerProductVersion=$(InstallerProductVersion);
@@ -21,5 +21,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HandleScope\HandleScope.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
   </ItemGroup>
 </Project>

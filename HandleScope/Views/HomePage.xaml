@@ -50,6 +50,7 @@
                          Grid.Column="0"
                          Margin="0,0,12,0"
                          AllowDrop="True"
+                         IsEnabled="{Binding IsIdle}"
                          materialDesign:HintAssist.Hint="{Binding TargetPathHint, Source={StaticResource ResourceWrapper}}"
                          materialDesign:HintAssist.IsFloating="False"
                          materialDesign:TextFieldAssist.HasClearButton="True"
@@ -61,6 +62,7 @@
                 <Button Grid.Column="1"
                         Margin="0,0,8,0"
                         Command="{Binding BrowseCommand}"
+                        IsEnabled="{Binding IsIdle}"
                         Content="{Binding BrowseButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="2"
@@ -72,17 +74,36 @@
                 <Button Grid.Column="3"
                         Margin="0,0,8,0"
                         Command="{Binding RefreshCommand}"
+                        IsEnabled="{Binding IsIdle}"
                         Content="{Binding RefreshButton, Source={StaticResource ResourceWrapper}}" />
 
                 <Button Grid.Column="4"
                         Margin="0,0,8,0"
                         Style="{StaticResource DangerButtonStyle}"
-                        Command="{Binding EndSelectedProcessCommand}"
-                        Content="{Binding EndProcessButton, Source={StaticResource ResourceWrapper}}" />
+                        IsEnabled="{Binding IsIdle}"
+                        Command="{Binding EndSelectedProcessCommand}">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="24" />
+                        </Grid.ColumnDefinitions>
+                        <ContentControl Grid.Column="0"
+                                        Style="{StaticResource ActionButtonBusyIndicatorStyle}"
+                                        Visibility="{Binding IsEndingProcess, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"
+                                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                                   Text="{Binding EndProcessButton, Source={StaticResource ResourceWrapper}}" />
+                    </Grid>
+                </Button>
 
                 <StackPanel Grid.Row="1"
                             Grid.ColumnSpan="5"
                             Margin="0,14,0,0"
+                            IsEnabled="{Binding IsIdle}"
                             Orientation="Horizontal">
                     <TextBlock Margin="0,0,8,0"
                                VerticalAlignment="Center"
@@ -107,6 +128,7 @@
                     BorderThickness="1"
                     CornerRadius="8">
                 <DataGrid ItemsSource="{Binding Results}"
+                          IsEnabled="{Binding IsIdle}"
                           CanUserResizeColumns="True"
                           CellStyle="{StaticResource ResultDataGridCellStyle}"
                           ColumnHeaderStyle="{StaticResource ResultDataGridColumnHeaderStyle}"
@@ -200,5 +222,37 @@
                            Text="{Binding ErrorMessage}" />
             </Border>
         </StackPanel>
+
+        <Grid Grid.RowSpan="4"
+              Panel.ZIndex="10"
+              IsHitTestVisible="{Binding IsEndingProcess}"
+              Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Background" Value="{StaticResource TransparentBrush}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEndingProcess}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource Brush.BusyOverlay}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border Padding="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource Brush.Surface}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <StackPanel HorizontalAlignment="Center">
+                    <ContentControl HorizontalAlignment="Center"
+                                    Style="{StaticResource PageBusyIndicatorStyle}" />
+                    <TextBlock Margin="0,12,0,0"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Text="{Binding StatusMessage}" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

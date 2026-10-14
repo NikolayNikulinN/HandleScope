@@ -1,17 +1,30 @@
 # HandleScope
 
-Windows File Lock Detection Utility
+**Find out which Windows processes are using a file or folder.**
 
-![HandleScope Main Window](HandleScope/Docs/Images/app.png)
+HandleScope is a Windows desktop app for investigating files that cannot be moved, renamed, deleted, or modified because another process is using them. It uses the Windows Restart Manager API to find associated processes, shows their details, and can end a selected process after confirmation.
 
-HandleScope is a Windows desktop utility that identifies processes locking files and folders, helping users quickly discover why resources cannot be deleted, moved, renamed, or modified.
+Built with WPF and .NET 9 using MVVM.
 
-Built with WPF on .NET 9 using the MVVM pattern and powered by the Windows Restart Manager API.
+## Screenshots
+
+### Locking processes found
+
+![HandleScope showing two processes associated with files in a selected folder](HandleScope/Docs/Images/app2.png)
+
+### Search in progress
+
+![HandleScope showing the search indicator and an available Stop button](HandleScope/Docs/Images/app3.png)
+
+### Ready to search
+
+![HandleScope main window before selecting a file or folder](HandleScope/Docs/Images/app.png)
 
 ## Features
 
 * Find processes locking a selected file.
 * Search for locks inside a folder, including child paths.
+* Enter a path, browse, or drop a file or folder into the path field.
 * View process details, including:
 
   * Process name
@@ -21,8 +34,15 @@ Built with WPF on .NET 9 using the MVVM pattern and powered by the Windows Resta
   * Locked path
 * Refresh results without selecting the target again.
 * Cancel long-running searches.
-* End a selected process with confirmation.
+* End a selected process with confirmation and request administrator permission only when needed.
 * Log errors and diagnostic information.
+
+## Using HandleScope
+
+1. Select **File** or **Folder**, then enter a path, use **Browse**, or drop one file or folder into the path field.
+2. For folder searches, leave **Include child paths** selected to scan files in subfolders, or clear it to scan only files directly in the selected folder.
+3. Select **Search** to find associated processes. Select **Stop** to cancel a search in progress.
+4. Review the process details. To close one, check the box beside it and choose **End Process**. HandleScope asks for confirmation and may show a Windows administrator prompt if elevated rights are required.
 
 ## Technology Stack
 
@@ -54,8 +74,8 @@ Because Restart Manager works with file resources, pure directory handles are no
 
 ### Runtime
 
-* Windows operating system
-* .NET 9 Desktop Runtime (for framework-dependent deployments)
+* Windows 10 or Windows 11
+* .NET 9 Desktop Runtime
 
 ## Build and Run
 
@@ -99,7 +119,7 @@ HandleScope.Installer\bin\Release\x64\HandleScopeSetup.msi
 
 The installer:
 
-* Installs the application into `Program Files\HandleScope`
+* Installs the application into `Program Files\HandleScope` or `Program Files (x86)\HandleScope`, depending on the MSI architecture
 * Creates Start Menu shortcuts
 * Creates a Desktop shortcut
 * Registers the application in Windows Programs and Features
@@ -112,6 +132,7 @@ HandleScope.Services/        Service contracts, models, and Windows process serv
 HandleScope.Presentation/    Shared WPF resources and controls
 HandleScope.Logger/          Logging configuration and constants
 HandleScope.Installer/       WiX MSI installer project
+HandleScope.Services.Tests/  Unit tests for service behavior
 ```
 
 ## Logging
@@ -130,6 +151,8 @@ Terminating processes may result in unsaved work being lost.
 
 Always review process information carefully before ending a process.
 
-## GitHub Description
+## GitHub repository description
 
-Find and manage processes locking files and folders. Built with WPF, .NET 9, and Windows Restart Manager.
+Find Windows processes using your files and folders. Inspect locks and end selected processes with a WPF desktop app.
+
+Suggested topics: `windows`, `wpf`, `dotnet`, `file-locks`, `restart-manager`, `wix`.

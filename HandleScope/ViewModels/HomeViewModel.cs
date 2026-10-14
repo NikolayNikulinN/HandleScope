@@ -9,6 +9,7 @@ using Serilog;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Threading;
 using HandleScope.Models;
 
 namespace HandleScope.ViewModels;
@@ -33,11 +34,11 @@ public sealed partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
     [NotifyCanExecuteChangedFor(nameof(SearchOrStopCommand))]
-    private string _targetPath = string.Empty;
+    private string targetPath = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDirectorySearchMode))]
-    private HandleSearchModeOption _selectedSearchMode = null!;
+    private HandleSearchModeOption selectedSearchMode = null!;
 
     [ObservableProperty]
     private bool _includeChildren = true;
@@ -49,8 +50,9 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
     [NotifyPropertyChangedFor(nameof(IsIdle))]
+    [NotifyPropertyChangedFor(nameof(IsBusy))]
     [NotifyPropertyChangedFor(nameof(SearchOrStopButtonText))]
-    private bool _isSearching;
+    private bool isSearching;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
@@ -59,22 +61,25 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(BrowseCommand))]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
     [NotifyPropertyChangedFor(nameof(IsIdle))]
-    private bool _isEndingProcess;
+    [NotifyPropertyChangedFor(nameof(IsBusy))]
+    private bool isEndingProcess;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(EndSelectedProcessCommand))]
     private HandleLockResultModel? selectedResult;
 
     [ObservableProperty]
-    private string _statusMessage = string.Empty;
+    private string statusMessage = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
-    private string? _errorMessage;
+    private string? errorMessage;
 
     public IResourceWrapper ResourceWrapper => resourceWrapper;
 
     public bool IsIdle => !IsSearching && !IsEndingProcess;
+
+    public bool IsBusy => IsSearching || IsEndingProcess;
 
     public string SearchOrStopButtonText => resourceWrapper.Get(IsSearching ? UiTextKey.StopButton : UiTextKey.SearchButton);
 
@@ -92,16 +97,16 @@ public sealed partial class HomeViewModel : ObservableObject
                          IResourceWrapper resourceWrapper,
                          IProcessTerminationConfirmationService processTerminationConfirmationService)
     {
-        handleSearchService = handleSearchService;
-        processActionService = processActionService;
-        logger = logger.ForContext<HomeViewModel>();
-        resourceWrapper = resourceWrapper;
+        this.handleSearchService = handleSearchService;
+        this.processActionService = processActionService;
+        this.logger = logger.ForContext<HomeViewModel>();
+        this.resourceWrapper = resourceWrapper;
         this.processTerminationConfirmationService = processTerminationConfirmationService;
         var fileMode = new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.FileSearchModeDisplayName), HandleSearchMode.File);
         SearchModes = [fileMode,
                        new HandleSearchModeOption(resourceWrapper.Get(UiTextKey.DirectorySearchModeDisplayName), HandleSearchMode.Directory)];
-        _selectedSearchMode = fileMode;
-        _statusMessage = resourceWrapper.Get(UiTextKey.InitialStatusMessage);
+        selectedSearchMode = fileMode;
+        statusMessage = resourceWrapper.Get(UiTextKey.InitialStatusMessage);
     }
 
     /// <summary>Uses a dropped file or folder as the next search target.</summary>
@@ -219,6 +224,8 @@ public sealed partial class HomeViewModel : ObservableObject
             ErrorMessage = null;
             StatusMessage = string.Format(resourceWrapper.Get(UiTextKey.EndingProcessStatusFormat), selected.ProcessName);
 
+            await Dispatcher.Yield(DispatcherPriority.Background);
+
             var result = await processActionService.CloseProcessAsync(selected.ProcessId, CancellationToken.None);
             StatusMessage = result.Message;
 
@@ -266,6 +273,9 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             IsSearching = true;
             StatusMessage = resourceWrapper.Get(UiTextKey.SearchInProgressStatusMessage);
+
+            // Let WPF render the busy state before a fast search can complete.
+            await Dispatcher.Yield(DispatcherPriority.Background);
 
             if (rememberRequest)
             {
@@ -326,7 +336,7 @@ public sealed partial class HomeViewModel : ObservableObject
 
     private bool CanSearchOrStop()
     {
-        return IsSearching || CanSearch();
+        return !IsEndingProcess && (IsSearching || CanSearch());
     }
 
     private bool CanRefresh()

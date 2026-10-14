@@ -85,6 +85,7 @@
     <Color x:Key="Color.StopButtonBorder">#FFB65A69</Color>
     <Color x:Key="Color.ResultHeader">#FF283847</Color>
     <Color x:Key="Color.ResultHeaderDivider">#FF607789</Color>
+    <Color x:Key="Color.BusyOverlay">#99111821</Color>
 
     <SolidColorBrush x:Key="Brush.AppBackground" Color="{StaticResource Color.AppBackground}" />
     <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
@@ -110,4 +111,5 @@
     <SolidColorBrush x:Key="Brush.StopButtonBorder" Color="{StaticResource Color.StopButtonBorder}" />
     <SolidColorBrush x:Key="Brush.ResultHeader" Color="{StaticResource Color.ResultHeader}" />
     <SolidColorBrush x:Key="Brush.ResultHeaderDivider" Color="{StaticResource Color.ResultHeaderDivider}" />
+    <SolidColorBrush x:Key="Brush.BusyOverlay" Color="{StaticResource Color.BusyOverlay}" />
 </ResourceDictionary>

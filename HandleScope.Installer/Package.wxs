@@ -8,6 +8,8 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
     <MediaTemplate EmbedCab="yes" />
+    <UIRef Id="WixUI_Common" />
+    <UIRef Id="SingleButtonInstallUI" />
     <Icon Id="HandleScopeInstallerIcon.ico" SourceFile="..\HandleScope.Presentation\Images\appIcon.ico" />
     <Property Id="ARPPRODUCTICON" Value="HandleScopeInstallerIcon.ico" />
 

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Presentation", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Services", "HandleScope.Services\HandleScope.Services.csproj", "{BA174A09-8DA8-4311-97ED-CD6856340FE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleScope.Services.Tests", "HandleScope.Services.Tests\HandleScope.Services.Tests.csproj", "{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{BA174A09-8DA8-4311-97ED-CD6856340FE5}.Release|x64.Build.0 = Release|Any CPU
 		{BA174A09-8DA8-4311-97ED-CD6856340FE5}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA174A09-8DA8-4311-97ED-CD6856340FE5}.Release|x86.Build.0 = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|x64.Build.0 = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Debug|x86.Build.0 = Debug|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|x64.ActiveCfg = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|x64.Build.0 = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|x86.ActiveCfg = Release|Any CPU
+		{34E251A5-ABAC-41B6-97D4-23B7267DAEDE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
