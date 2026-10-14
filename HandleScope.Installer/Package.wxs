@@ -1,9 +1,14 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <?define Manufacturer = "dLiX Software" ?>
+  <?define ProductName = "HandleScope" ?>
+  <?define UpgradeCode = "7F5C75EF-BCE5-4B99-91F7-6A45062F84E1" ?>
+	
   <Package
-    Name="HandleScope"
+	Name="$(var.ProductName)"
     Manufacturer="$(var.Manufacturer)"
     Version="$(var.InstallerProductVersion)"
-    UpgradeCode="{7F5C75EF-BCE5-4B99-91F7-6A45062F84E1}"
+    UpgradeCode="$(var.UpgradeCode)"  
     Scope="perMachine">
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of HandleScope is already installed." />
